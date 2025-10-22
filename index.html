@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Чат-комнаты</title>
+    <title>Чат-комнаты | Общение в реальном времени</title>
     <style>
         * {
             margin: 0;
@@ -164,6 +164,12 @@
             background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
             color: white;
             box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
         }
 
         .alert-error {
@@ -348,6 +354,76 @@
             font-size: 0.9rem;
         }
 
+        /* Login Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            margin: 0;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .header h1 {
@@ -392,160 +468,264 @@
         <!-- User Menu -->
         <div class="user-menu">
             <div class="user-menu-content">
-                {% if user.is_authenticated %}
-                    <div class="user-info">
-                        <div class="user-avatar">
-                            {{ user.username|first|upper }}
-                        </div>
-                        <div class="user-details">
-                            <h3>👋 Привет, {{ user.username }}!</h3>
-                            <p>{{ user.email|default:"Добро пожаловать в чат" }}</p>
-                        </div>
+                <div class="user-info">
+                    <div class="user-details">
+                        <h3>👋 Добро пожаловать!</h3>
+                        <p>Присоединяйтесь к нашему сообществу</p>
                     </div>
-                    <div class="auth-buttons">
-                        <a href="{% url 'logout' %}" class="btn btn-secondary">
-                            🚪 Выйти
-                        </a>
-                    </div>
-                {% else %}
-                    <div class="user-info">
-                        <div class="user-details">
-                            <h3>👋 Добро пожаловать!</h3>
-                            <p>Присоединяйтесь к нашему сообществу</p>
-                        </div>
-                    </div>
-                    <div class="auth-buttons">
-                        <a href="{% url 'login' %}" class="btn btn-primary">
-                            🔑 Войти
-                        </a>
-                        <a href="{% url 'register' %}" class="btn btn-secondary">
-                            👤 Регистрация
-                        </a>
-                    </div>
-                {% endif %}
+                </div>
+                <div class="auth-buttons">
+                    <button onclick="openLoginModal()" class="btn btn-primary">
+                        🔑 Войти
+                    </button>
+                    <button onclick="openRegisterModal()" class="btn btn-secondary">
+                        👤 Регистрация
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Messages -->
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+        <div class="messages">
+            <div class="alert alert-info">
+                💡 Демо-версия чат-комнат. Для полного функционала требуется бэкенд.
             </div>
-        {% endif %}
+        </div>
 
-        <!-- Create Room Section -->
-        {% if user.is_authenticated %}
-            <div class="create-room-section">
-                <a href="{% url 'create_room' %}" class="btn create-room-btn">
-                    🚀 Создать новую комнату
-                </a>
+        <!-- Guest Notice -->
+        <div class="guest-notice">
+            <p>🔒 Для создания комнат и отправки сообщений необходимо авторизоваться</p>
+            <div class="auth-buttons">
+                <button onclick="openLoginModal()" class="btn btn-primary">
+                    🔑 Войти в систему
+                </button>
+                <button onclick="openRegisterModal()" class="btn btn-outline">
+                    👤 Создать аккаунт
+                </button>
             </div>
-        {% else %}
-            <div class="guest-notice">
-                <p>🔒 Для создания комнат и отправки сообщений необходимо авторизоваться</p>
-                <div class="auth-buttons">
-                    <a href="{% url 'login' %}" class="btn btn-primary">
-                        🔑 Войти в систему
-                    </a>
-                    <a href="{% url 'register' %}" class="btn btn-outline">
-                        👤 Создать аккаунт
-                    </a>
-                </div>
-            </div>
-        {% endif %}
+        </div>
 
         <!-- Rooms Grid -->
-        {% if rooms %}
-            <div class="rooms-grid">
-                {% for room in rooms %}
-                    <div class="room-card">
-                        <div class="room-header">
-                            <a href="{% url 'room_detail' room.id %}" class="room-title">
-                                {{ room.name }}
-                            </a>
-                            <div class="room-stats">
-                                <span class="stat-badge">👥 {{ room.members.count }}</span>
-                                <span class="stat-badge">💬 {{ room.messages.count }}</span>
-                            </div>
-                        </div>
-                        
-                        <p class="room-description">
-                            {{ room.description|default:"Комната для общения и обмена мнениями" }}
-                        </p>
-                        
-                        <div class="room-meta">
-                            <div class="meta-item">
-                                <span>👤</span>
-                                <span>{{ room.created_by.username }}</span>
-                            </div>
-                            <div class="meta-item">
-                                <span>📅</span>
-                                <span>{{ room.created_at|date:"d.m.Y" }}</span>
-                            </div>
-                            <div class="meta-item">
-                                <span>🕐</span>
-                                <span>{{ room.created_at|date:"H:i" }}</span>
-                            </div>
-                            {% if room.is_private %}
-                                <div class="meta-item">
-                                    <span>🔒</span>
-                                    <span>Приватная</span>
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="room-actions">
-                            <a href="{% url 'room_detail' room.id %}" class="btn btn-sm btn-chat">
-                                💬 Войти в чат
-                            </a>
-                            {% if user.is_authenticated and user == room.created_by or user.is_superuser %}
-                                <a href="{% url 'delete_room' room.id %}" class="btn btn-sm btn-delete" 
-                                   onclick="return confirm('Вы уверены, что хотите удалить комнату \{{ room.name }}\ Это действие нельзя отменить.');">
-                                     Удалить
-                                </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="empty-state">
-                <h2>😴 Пока здесь тихо...</h2>
-                <p>{% if user.is_authenticated %}Создайте первую комнату и начните общение!{% else %}Войдите в систему, чтобы создать первую комнату{% endif %}</p>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'create_room' %}" class="btn create-room-btn">
-                        🚀 Создать первую комнату
+        <div class="rooms-grid">
+            <div class="room-card">
+                <div class="room-header">
+                    <a href="#" class="room-title" onclick="showRoomAlert('Общая комната')">
+                        Общая комната
                     </a>
-                {% endif %}
+                    <div class="room-stats">
+                        <span class="stat-badge">👥 25</span>
+                        <span class="stat-badge">💬 142</span>
+                    </div>
+                </div>
+                
+                <p class="room-description">
+                    Основное пространство для общения на любые темы. Знакомьтесь, общайтесь, находите новых друзей!
+                </p>
+                
+                <div class="room-meta">
+                    <div class="meta-item">
+                        <span>👤</span>
+                        <span>Администратор</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>📅</span>
+                        <span>22.10.2024</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>🕐</span>
+                        <span>14:30</span>
+                    </div>
+                </div>
+                
+                <div class="room-actions">
+                    <button class="btn btn-sm btn-chat" onclick="showRoomAlert('Общая комната')">
+                        💬 Войти в чат
+                    </button>
+                </div>
             </div>
-        {% endif %}
+
+            <div class="room-card">
+                <div class="room-header">
+                    <a href="#" class="room-title" onclick="showRoomAlert('Технические вопросы')">
+                        Технические вопросы
+                    </a>
+                    <div class="room-stats">
+                        <span class="stat-badge">👥 18</span>
+                        <span class="stat-badge">💬 89</span>
+                    </div>
+                </div>
+                
+                <p class="room-description">
+                    Помощь с программированием, IT и технологиями. Задавайте вопросы, помогайте другим!
+                </p>
+                
+                <div class="room-meta">
+                    <div class="meta-item">
+                        <span>👤</span>
+                        <span>Технический модератор</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>📅</span>
+                        <span>21.10.2024</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>🕐</span>
+                        <span>11:15</span>
+                    </div>
+                </div>
+                
+                <div class="room-actions">
+                    <button class="btn btn-sm btn-chat" onclick="showRoomAlert('Технические вопросы')">
+                        💬 Войти в чат
+                    </button>
+                </div>
+            </div>
+
+            <div class="room-card">
+                <div class="room-header">
+                    <a href="#" class="room-title" onclick="showRoomAlert('Игры и развлечения')">
+                        Игры и развлечения
+                    </a>
+                    <div class="room-stats">
+                        <span class="stat-badge">👥 32</span>
+                        <span class="stat-badge">💬 215</span>
+                    </div>
+                </div>
+                
+                <p class="room-description">
+                    Обсуждаем игры, кино, музыку и другие развлечения. Делитесь впечатлениями и находите единомышленников!
+                </p>
+                
+                <div class="room-meta">
+                    <div class="meta-item">
+                        <span>👤</span>
+                        <span>Геймер_Про</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>📅</span>
+                        <span>20.10.2024</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>🕐</span>
+                        <span>16:45</span>
+                    </div>
+                </div>
+                
+                <div class="room-actions">
+                    <button class="btn btn-sm btn-chat" onclick="showRoomAlert('Игры и развлечения')">
+                        💬 Войти в чат
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <!-- Footer -->
         <div class="footer">
-        
+            <p>© 2024 Чат-комнаты | Демо-версия для GitHub Pages</p>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔑 Вход в систему</h2>
+                <span class="close" onclick="closeLoginModal()">&times;</span>
+            </div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Имя пользователя:</label>
+                    <input type="text" id="username" placeholder="Введите ваш логин" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" placeholder="Введите ваш пароль" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Войти
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>👤 Регистрация</h2>
+                <span class="close" onclick="closeRegisterModal()">&times;</span>
+            </div>
+            <form onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="regUsername">Имя пользователя:</label>
+                    <input type="text" id="regUsername" placeholder="Придумайте логин" required>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email:</label>
+                    <input type="email" id="regEmail" placeholder="Введите ваш email" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Пароль:</label>
+                    <input type="password" id="regPassword" placeholder="Придумайте пароль" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPasswordConfirm">Подтвердите пароль:</label>
+                    <input type="password" id="regPasswordConfirm" placeholder="Повторите пароль" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Зарегистрироваться
+                </button>
+            </form>
         </div>
     </div>
 
     <script>
-        // Подтверждение удаления комнаты
-        function confirmDelete(roomName) {
-            return confirm('Вы уверены, что хотите удалить комнату "' + roomName + '"?\n\nВсе сообщения и данные этой комнаты будут безвозвратно удалены.');
+        // Modal functions
+        function openLoginModal() {
+            document.getElementById('loginModal').style.display = 'block';
         }
 
-        // Добавляем обработчики для всех кнопок удаления
-        document.querySelectorAll('.btn-delete').forEach(function(button) {
-            button.addEventListener('click', function(e) {
-                const roomCard = this.closest('.room-card');
-                const roomName = roomCard.querySelector('.room-title').textContent;
-                if (!confirmDelete(roomName)) {
-                    e.preventDefault();
-                }
-            });
-        });
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        function openRegisterModal() {
+            document.getElementById('registerModal').style.display = 'block';
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('registerModal').style.display = 'none';
+        }
+
+        // Form handlers
+        function handleLogin(event) {
+            event.preventDefault();
+            alert('Вход выполнен! (демо-режим)');
+            closeLoginModal();
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            alert('Регистрация завершена! (демо-режим)');
+            closeRegisterModal();
+        }
+
+        function showRoomAlert(roomName) {
+            alert(`Вы пытаетесь войти в комнату "${roomName}".\n\nВ демо-версии функционал чата недоступен. Для полного функционала требуется бэкенд на Django.`);
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const loginModal = document.getElementById('loginModal');
+            const registerModal = document.getElementById('registerModal');
+            
+            if (event.target === loginModal) {
+                closeLoginModal();
+            }
+            if (event.target === registerModal) {
+                closeRegisterModal();
+            }
+        }
 
         // Анимация появления карточек
         document.addEventListener('DOMContentLoaded', function() {
