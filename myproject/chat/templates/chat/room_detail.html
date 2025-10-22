@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ room.name }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            line-height: 1.4;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .room-header {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px;
+            color: #007bff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .room-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: center;
+            flex: 1;
+        }
+
+        .room-info-wrapper {
+            position: relative;
+        }
+
+        .info-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .info-btn:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+
+        /* Chat Container */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Messages List */
+        .messages-list {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            background: #f0f2f5;
+        }
+
+        /* Message Styles */
+        .message {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            max-width: 100%;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .message.own-message .message-avatar {
+            background: #007bff;
+        }
+
+        .message-content {
+            background: white;
+            border-radius: 12px;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            max-width: 70%;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .message.own-message .message-content {
+            background: #007bff;
+            color: white;
+            border: none;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+
+        .message-username {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #2c3e50;
+        }
+
+        .message.own-message .message-username {
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .message-text {
+            font-size: 0.9rem;
+            line-height: 1.3;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            color: #2c3e50;
+            margin-bottom: 16px;
+        }
+
+        .message.own-message .message-text {
+            color: white;
+        }
+
+        .message-time {
+            position: absolute;
+            bottom: 4px;
+            right: 8px;
+            font-size: 0.65rem;
+            color: #8e8e93;
+        }
+
+        .message.own-message .message-time {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Empty State */
+        .empty-messages {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8e8e93;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .empty-messages .icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            opacity: 0.4;
+        }
+
+        .empty-messages h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .empty-messages p {
+            opacity: 0.6;
+            font-size: 0.85rem;
+        }
+
+        /* Message Input */
+        .message-input-area {
+            padding: 12px 15px;
+            border-top: 1px solid #e0e0e0;
+            background: white;
+            flex-shrink: 0;
+        }
+
+        .message-form {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .message-input-container {
+            flex: 1;
+        }
+
+        .message-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            resize: none;
+            min-height: 40px;
+            max-height: 120px;
+            line-height: 1.3;
+        }
+
+        .message-input:focus {
+            border-color: #007bff;
+            background: white;
+        }
+
+        .send-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover {
+            background: #0056b3;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .guest-notice {
+            background: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #ffeaa7;
+            font-size: 0.85rem;
+        }
+
+        .guest-notice a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            background: #007bff;
+            color: white;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 3px;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #6c757d;
+        }
+
+        /* Scrollbar */
+        .messages-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .messages-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages-list::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 2px;
+        }
+
+        .messages-list::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        @media (max-width: 768px) {
+            .room-header {
+                padding: 12px 15px;
+            }
+            
+            .messages-list {
+                padding: 10px;
+            }
+            
+            .message-input-area {
+                padding: 10px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Room Header -->
+        <div class="room-header">
+            <a href="{% url 'home' %}" class="back-btn">
+                ←
+            </a>
+            <div class="room-title">💬 {{ room.name }}</div>
+            <div class="room-info-wrapper">
+                <button class="info-btn" id="infoBtn" title="Информация о чате">
+                    ⓘ
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <div class="messages-list" id="messages-list">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="message {% if message.user == user %}own-message{% endif %}">
+                            <div class="message-avatar">
+                                {{ message.user.username|first|upper }}
+                            </div>
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-username">
+                                        {% if message.user == user %}
+                                            Вы
+                                        {% else %}
+                                            {{ message.user.username }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="message-text">
+                                    {{ message.message }}
+                                </div>
+                                <span class="message-time">
+                                    {{ message.timestamp|date:"H:i" }}
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-messages">
+                        <div class="icon">💬</div>
+                        <h3>Здесь пока тихо</h3>
+                        <p>Будьте первым, кто напишет сообщение!</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="message-input-area">
+                {% if user.is_authenticated %}
+                    <form method="post" class="message-form">
+                        {% csrf_token %}
+                        <div class="message-input-container">
+                            <textarea 
+                                name="message" 
+                                class="message-input" 
+                                placeholder="Напишите сообщение..." 
+                                required
+                                rows="1"
+                            ></textarea>
+                        </div>
+                        <button type="submit" class="send-btn" title="Отправить">
+                            ➤
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="guest-notice">
+                        <p>🔒 <a href="{% url 'login' %}">Войдите</a> или <a href="{% url 'register' %}">зарегистрируйтесь</a></p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Room Info -->
+    <div class="modal-overlay" id="infoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Информация о чате</h2>
+                <button class="modal-close" id="modalClose">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-value" id="modalMembersCount">{{ room_members.count }}</span>
+                        <span class="stat-label">👥 Участники</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="modalMessagesCount">{{ room.messages.count }}</span>
+                        <span class="stat-label">💬 Сообщения</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="modalLinksCount">0</span>
+                        <span class="stat-label">🔗 Ссылки</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="modalMediaCount">0</span>
+                        <span class="stat-label">🖼️ Медиа</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="modalFilesCount">0</span>
+                        <span class="stat-label">📎 Файлы</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="modalMusicCount">0</span>
+                        <span class="stat-label">🎵 Музыка</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="modalVoiceCount">0</span>
+                        <span class="stat-label">🎤 Голосовые</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function scrollToBottom() {
+            const messagesList = document.getElementById('messages-list');
+            if (messagesList) {
+                messagesList.scrollTop = messagesList.scrollHeight;
+            }
+        }
+
+        function analyzeMessages() {
+            const messages = document.querySelectorAll('.message-text');
+            let linksCount = 0, mediaCount = 0, filesCount = 0, musicCount = 0, voiceCount = 0;
+
+            const linkRegex = /https?:\/\/[^\s]+/g;
+            const mediaRegex = /\.(jpg|jpeg|png|gif|bmp|webp|mp4|avi|mov|webm)$/i;
+            const fileRegex = /\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip|rar|7z)$/i;
+            const musicRegex = /\.(mp3|wav|ogg|flac|m4a)$/i;
+            const voiceRegex = /🎤|голосовое|voice|аудио|audio/i;
+
+            messages.forEach(message => {
+                const text = message.textContent;
+                const links = text.match(linkRegex);
+                if (links) {
+                    linksCount += links.length;
+                    links.forEach(link => {
+                        if (mediaRegex.test(link)) mediaCount++;
+                        if (fileRegex.test(link)) filesCount++;
+                        if (musicRegex.test(link)) musicCount++;
+                    });
+                }
+                if (voiceRegex.test(text)) voiceCount++;
+            });
+
+            document.getElementById('modalLinksCount').textContent = linksCount;
+            document.getElementById('modalMediaCount').textContent = mediaCount;
+            document.getElementById('modalFilesCount').textContent = filesCount;
+            document.getElementById('modalMusicCount').textContent = musicCount;
+            document.getElementById('modalVoiceCount').textContent = voiceCount;
+        }
+
+        function setupModal() {
+            const infoBtn = document.getElementById('infoBtn');
+            const modal = document.getElementById('infoModal');
+            const modalClose = document.getElementById('modalClose');
+
+            if (infoBtn && modal) {
+                infoBtn.addEventListener('click', () => {
+                    modal.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                });
+
+                function closeModal() {
+                    modal.classList.remove('show');
+                    document.body.style.overflow = 'auto';
+                }
+
+                modalClose.addEventListener('click', closeModal);
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal();
+                });
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && modal.classList.contains('show')) {
+                        closeModal();
+                    }
+                });
+            }
+        }
+
+        function autoResizeTextarea(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            scrollToBottom();
+            analyzeMessages();
+            setupModal();
+            
+            const messageInput = document.querySelector('.message-input');
+            if (messageInput) {
+                // Auto-resize textarea
+                messageInput.addEventListener('input', function() {
+                    autoResizeTextarea(this);
+                });
+
+                // Handle Enter key (send on Enter, new line on Shift+Enter)
+                messageInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        const form = document.querySelector('form');
+                        if (form && messageInput.value.trim()) {
+                            const sendBtn = form.querySelector('.send-btn');
+                            sendBtn.disabled = true;
+                            sendBtn.innerHTML = '⏳';
+                            form.submit();
+                        }
+                    }
+                });
+                
+                // Focus on input
+                messageInput.focus();
+                
+                // Initial resize
+                autoResizeTextarea(messageInput);
+            }
+        });
+
+        // Auto-scroll when new messages are added
+        const observer = new MutationObserver(scrollToBottom);
+        const messagesList = document.getElementById('messages-list');
+        if (messagesList) {
+            observer.observe(messagesList, { childList: true, subtree: true });
+        }
+    </script>
+</body>
+</html>
