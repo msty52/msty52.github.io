@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Чат-комнаты</title>
+    <title>Чат-комнаты | Общение в реальном времени</title>
     <style>
         * {
             margin: 0;
@@ -12,11 +12,11 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             color: #333;
             line-height: 1.6;
-            min-height: 100vh;
         }
 
         .container {
@@ -25,304 +25,710 @@
             padding: 20px;
         }
 
-        header {
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* User Menu */
+        .user-menu {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            padding: 2rem;
-            border-radius: 15px;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        h1 {
-            color: #4a5568;
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .subtitle {
-            color: #718096;
-            font-size: 1.2rem;
-            margin-bottom: 1.5rem;
+        .user-menu-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .user-info {
-            background: #e2e8f0;
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .user-details h3 {
+            margin: 0;
+            color: #333;
+            font-size: 1.3rem;
+        }
+
+        .user-details p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
         }
 
         .auth-buttons {
             display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .btn {
             padding: 12px 24px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
             text-decoration: none;
-            display: inline-block;
             text-align: center;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary {
-            background: #4c6ef5;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
         .btn-primary:hover {
-            background: #3b5bdb;
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
         }
 
         .btn-secondary {
-            background: #868e96;
-            color: white;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border: 2px solid rgba(102, 126, 234, 0.3);
         }
 
         .btn-secondary:hover {
-            background: #495057;
+            background: white;
+            border-color: #667eea;
             transform: translateY(-2px);
         }
 
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin: 1.5rem 0;
-            flex-wrap: wrap;
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
-        .stat-item {
-            background: white;
-            padding: 1rem 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        /* Messages */
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        /* Create Room Section */
+        .create-room-section {
             text-align: center;
+            margin-bottom: 40px;
         }
 
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #4c6ef5;
+        .create-room-btn {
+            background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+            color: white;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 188, 212, 0.4);
         }
 
-        .stat-label {
-            color: #718096;
-            font-size: 0.9rem;
+        .create-room-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 188, 212, 0.6);
         }
 
+        .guest-notice {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .guest-notice p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        /* Rooms Grid */
         .rooms-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
         }
 
         .room-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            padding: 1.5rem;
-            border-radius: 15px;
+            border-radius: 20px;
+            padding: 25px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .room-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .room-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
         .room-header {
             display: flex;
-            justify-content: between;
-            align-items: start;
-            margin-bottom: 1rem;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
         }
 
-        .room-name {
+        .room-title {
             font-size: 1.4rem;
-            color: #2d3748;
-            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: #333;
+            text-decoration: none;
+            flex: 1;
+        }
+
+        .room-title:hover {
+            color: #667eea;
+        }
+
+        .room-stats {
+            display: flex;
+            gap: 10px;
+            margin-left: 15px;
+        }
+
+        .stat-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
         }
 
         .room-description {
-            color: #718096;
-            margin-bottom: 1rem;
+            color: #666;
+            margin-bottom: 20px;
             line-height: 1.5;
         }
 
         .room-meta {
             display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .room-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            flex: 1;
+        }
+
+        .btn-chat {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        .empty-state h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            margin-bottom: 25px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Login Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e2e8f0;
-            font-size: 0.9rem;
-            color: #718096;
+            margin-bottom: 20px;
         }
 
-        .create-room {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            margin-top: 2rem;
+        .modal-header h2 {
+            color: #333;
+            margin: 0;
         }
 
-        .create-room h2 {
-            color: #4a5568;
-            margin-bottom: 1rem;
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
         }
 
-        .guest-message {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 1rem;
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
             border-radius: 10px;
-            margin: 1.5rem 0;
-            text-align: center;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
         }
 
-        footer {
-            text-align: center;
-            margin-top: 3rem;
-            padding: 2rem;
-            color: white;
-            opacity: 0.8;
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
+        /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
+            .header h1 {
+                font-size: 2.2rem;
             }
-            
-            h1 {
-                font-size: 2rem;
+
+            .user-menu-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
             }
-            
+
+            .auth-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+
             .rooms-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .stats {
+
+            .room-header {
                 flex-direction: column;
-                align-items: center;
+                gap: 10px;
+            }
+
+            .room-stats {
+                margin-left: 0;
+                align-self: flex-start;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Чат-комнаты</h1>
-            <p class="subtitle">Общайтесь в реальном времени с друзьями и коллегами</p>
-            
-            <div class="user-info">
-                <p><strong>Привет, Гость!</strong></p>
-                <p>Для создания комнат и отправки сообщений необходимо авторизоваться</p>
-            </div>
-            
-            <div class="auth-buttons">
-                <a href="#" class="btn btn-primary">Войти в систему</a>
-                <a href="#" class="btn btn-secondary">Регистрация</a>
-            </div>
-            
-            <div class="stats">
-                <div class="stat-item">
-                    <div class="stat-number">6</div>
-                    <div class="stat-label">активных комнат</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">42</div>
-                    <div class="stat-label">сообщений сегодня</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">128</div>
-                    <div class="stat-label">участников онлайн</div>
-                </div>
-            </div>
-        </header>
-
-        <div class="guest-message">
-            <p>Присоединяйтесь к нашему сообществу! Зарегистрируйтесь для полного доступа.</p>
+        <!-- Header -->
+        <div class="header">
+            <h1>💬 Чат-комнаты</h1>
+            <p>Общайтесь в реальном времени с друзьями и коллегами</p>
         </div>
 
+        <!-- User Menu -->
+        <div class="user-menu">
+            <div class="user-menu-content">
+                <div class="user-info">
+                    <div class="user-details">
+                        <h3>👋 Добро пожаловать!</h3>
+                        <p>Присоединяйтесь к нашему сообществу</p>
+                    </div>
+                </div>
+                <div class="auth-buttons">
+                    <button onclick="openLoginModal()" class="btn btn-primary">
+                        🔑 Войти
+                    </button>
+                    <button onclick="openRegisterModal()" class="btn btn-secondary">
+                        👤 Регистрация
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="messages">
+            <div class="alert alert-info">
+                💡 Демо-версия чат-комнат. Для полного функционала требуется бэкенд.
+            </div>
+        </div>
+
+        <!-- Guest Notice -->
+        <div class="guest-notice">
+            <p>🔒 Для создания комнат и отправки сообщений необходимо авторизоваться</p>
+            <div class="auth-buttons">
+                <button onclick="openLoginModal()" class="btn btn-primary">
+                    🔑 Войти в систему
+                </button>
+                <button onclick="openRegisterModal()" class="btn btn-outline">
+                    👤 Создать аккаунт
+                </button>
+            </div>
+        </div>
+
+        <!-- Rooms Grid -->
         <div class="rooms-grid">
             <div class="room-card">
                 <div class="room-header">
-                    <h3 class="room-name">Общая комната</h3>
+                    <a href="#" class="room-title" onclick="showRoomAlert('Общая комната')">
+                        Общая комната
+                    </a>
+                    <div class="room-stats">
+                        <span class="stat-badge">👥 25</span>
+                        <span class="stat-badge">💬 142</span>
+                    </div>
                 </div>
-                <p class="room-description">Основное пространство для общения на любые темы. Знакомьтесь, общайтесь, находите новых друзей!</p>
+                
+                <p class="room-description">
+                    Основное пространство для общения на любые темы. Знакомьтесь, общайтесь, находите новых друзей!
+                </p>
+                
                 <div class="room-meta">
-                    <span>Создал: Администратор</span>
-                    <span>25 участников</span>
+                    <div class="meta-item">
+                        <span>👤</span>
+                        <span>Администратор</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>📅</span>
+                        <span>22.10.2024</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>🕐</span>
+                        <span>14:30</span>
+                    </div>
+                </div>
+                
+                <div class="room-actions">
+                    <button class="btn btn-sm btn-chat" onclick="showRoomAlert('Общая комната')">
+                        💬 Войти в чат
+                    </button>
                 </div>
             </div>
 
             <div class="room-card">
                 <div class="room-header">
-                    <h3 class="room-name">Технические вопросы</h3>
+                    <a href="#" class="room-title" onclick="showRoomAlert('Технические вопросы')">
+                        Технические вопросы
+                    </a>
+                    <div class="room-stats">
+                        <span class="stat-badge">👥 18</span>
+                        <span class="stat-badge">💬 89</span>
+                    </div>
                 </div>
-                <p class="room-description">Помощь с программированием, IT и технологиями. Задавайте вопросы, помогайте другим!</p>
+                
+                <p class="room-description">
+                    Помощь с программированием, IT и технологиями. Задавайте вопросы, помогайте другим!
+                </p>
+                
                 <div class="room-meta">
-                    <span>Создал: Технический модератор</span>
-                    <span>18 участников</span>
+                    <div class="meta-item">
+                        <span>👤</span>
+                        <span>Технический модератор</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>📅</span>
+                        <span>21.10.2024</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>🕐</span>
+                        <span>11:15</span>
+                    </div>
+                </div>
+                
+                <div class="room-actions">
+                    <button class="btn btn-sm btn-chat" onclick="showRoomAlert('Технические вопросы')">
+                        💬 Войти в чат
+                    </button>
                 </div>
             </div>
 
             <div class="room-card">
                 <div class="room-header">
-                    <h3 class="room-name">Игры и развлечения</h3>
+                    <a href="#" class="room-title" onclick="showRoomAlert('Игры и развлечения')">
+                        Игры и развлечения
+                    </a>
+                    <div class="room-stats">
+                        <span class="stat-badge">👥 32</span>
+                        <span class="stat-badge">💬 215</span>
+                    </div>
                 </div>
-                <p class="room-description">Обсуждаем игры, кино, музыку и другие развлечения. Делитесь впечатлениями!</p>
+                
+                <p class="room-description">
+                    Обсуждаем игры, кино, музыку и другие развлечения. Делитесь впечатлениями и находите единомышленников!
+                </p>
+                
                 <div class="room-meta">
-                    <span>Создал: Геймер_Про</span>
-                    <span>32 участника</span>
+                    <div class="meta-item">
+                        <span>👤</span>
+                        <span>Геймер_Про</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>📅</span>
+                        <span>20.10.2024</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>🕐</span>
+                        <span>16:45</span>
+                    </div>
                 </div>
-            </div>
-
-            <div class="room-card">
-                <div class="room-header">
-                    <h3 class="room-name">Работа и карьера</h3>
-                </div>
-                <p class="room-description">Профессиональное общение, поиск работы, карьерный рост и развитие навыков.</p>
-                <div class="room-meta">
-                    <span>Создал: HR_Специалист</span>
-                    <span>15 участников</span>
+                
+                <div class="room-actions">
+                    <button class="btn btn-sm btn-chat" onclick="showRoomAlert('Игры и развлечения')">
+                        💬 Войти в чат
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div class="create-room">
-            <h2>Создать новую комнату</h2>
-            <p>Хотите создать свою тематическую комнату? Войдите в систему и начните общение!</p>
-            <a href="#" class="btn btn-primary" style="margin-top: 1rem;">Создать комнату</a>
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2024 Чат-комнаты | Демо-версия для GitHub Pages</p>
         </div>
+    </div>
 
-        <footer>
-            <p>© 2024 Чат-комнаты. Все права защищены.</p>
-            <p>Размещено на GitHub Pages</p>
-        </footer>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔑 Вход в систему</h2>
+                <span class="close" onclick="closeLoginModal()">&times;</span>
+            </div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Имя пользователя:</label>
+                    <input type="text" id="username" placeholder="Введите ваш логин" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" placeholder="Введите ваш пароль" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Войти
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>👤 Регистрация</h2>
+                <span class="close" onclick="closeRegisterModal()">&times;</span>
+            </div>
+            <form onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="regUsername">Имя пользователя:</label>
+                    <input type="text" id="regUsername" placeholder="Придумайте логин" required>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email:</label>
+                    <input type="email" id="regEmail" placeholder="Введите ваш email" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Пароль:</label>
+                    <input type="password" id="regPassword" placeholder="Придумайте пароль" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPasswordConfirm">Подтвердите пароль:</label>
+                    <input type="password" id="regPasswordConfirm" placeholder="Повторите пароль" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    Зарегистрироваться
+                </button>
+            </form>
+        </div>
     </div>
 
     <script>
-        // Простой скрипт для демонстрации
+        // Modal functions
+        function openLoginModal() {
+            document.getElementById('loginModal').style.display = 'block';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        function openRegisterModal() {
+            document.getElementById('registerModal').style.display = 'block';
+        }
+
+        function closeRegisterModal() {
+            document.getElementById('registerModal').style.display = 'none';
+        }
+
+        // Form handlers
+        function handleLogin(event) {
+            event.preventDefault();
+            alert('Вход выполнен! (демо-режим)');
+            closeLoginModal();
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            alert('Регистрация завершена! (демо-режим)');
+            closeRegisterModal();
+        }
+
+        function showRoomAlert(roomName) {
+            alert(`Вы пытаетесь войти в комнату "${roomName}".\n\nВ демо-версии функционал чата недоступен. Для полного функционала требуется бэкенд на Django.`);
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const loginModal = document.getElementById('loginModal');
+            const registerModal = document.getElementById('registerModal');
+            
+            if (event.target === loginModal) {
+                closeLoginModal();
+            }
+            if (event.target === registerModal) {
+                closeRegisterModal();
+            }
+        }
+
+        // Анимация появления карточек
         document.addEventListener('DOMContentLoaded', function() {
-            // Анимация появления карточек
             const cards = document.querySelectorAll('.room-card');
             cards.forEach((card, index) => {
                 card.style.opacity = '0';
@@ -332,18 +738,8 @@
                     card.style.transition = 'all 0.6s ease';
                     card.style.opacity = '1';
                     card.style.transform = 'translateY(0)';
-                }, index * 200);
+                }, index * 100);
             });
-
-            // Обновление времени
-            function updateTime() {
-                const now = new Date();
-                document.getElementById('current-time').textContent = 
-                    now.toLocaleTimeString('ru-RU');
-            }
-            
-            setInterval(updateTime, 1000);
-            updateTime();
         });
     </script>
 </body>
