@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат-комнаты | Общение в реальном времени</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* User Menu */
+        .user-menu {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-menu-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .user-details h3 {
+            margin: 0;
+            color: #333;
+            font-size: 1.3rem;
+        }
+
+        .user-details p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        /* Messages */
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        /* Create Room Section */
+        .create-room-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .create-room-btn {
+            background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+            color: white;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 188, 212, 0.4);
+        }
+
+        .create-room-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 188, 212, 0.6);
+        }
+
+        .guest-notice {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .guest-notice p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        /* Rooms Grid */
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .room-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .room-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .room-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #333;
+            text-decoration: none;
+            flex: 1;
+        }
+
+        .room-title:hover {
+            color: #667eea;
+        }
+
+        .room-stats {
+            display: flex;
+            gap: 10px;
+            margin-left: 15px;
+        }
+
+        .stat-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .room-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .room-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .room-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            flex: 1;
+        }
+
+        .btn-chat {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        .empty-state h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            margin-bottom: 25px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+
+            .user-menu-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .auth-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .rooms-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .room-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .room-stats {
+                margin-left: 0;
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>💬 Чат-комнаты</h1>
+            <p>Общайтесь в реальном времени с друзьями и коллегами</p>
+        </div>
+
+        <!-- User Menu -->
+        <div class="user-menu">
+            <div class="user-menu-content">
+                {% if user.is_authenticated %}
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            {{ user.username|first|upper }}
+                        </div>
+                        <div class="user-details">
+                            <h3>👋 Привет, {{ user.username }}!</h3>
+                            <p>{{ user.email|default:"Добро пожаловать в чат" }}</p>
+                        </div>
+                    </div>
+                    <div class="auth-buttons">
+                        <a href="{% url 'logout' %}" class="btn btn-secondary">
+                            🚪 Выйти
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="user-info">
+                        <div class="user-details">
+                            <h3>👋 Добро пожаловать!</h3>
+                            <p>Присоединяйтесь к нашему сообществу</p>
+                        </div>
+                    </div>
+                    <div class="auth-buttons">
+                        <a href="{% url 'login' %}" class="btn btn-primary">
+                            🔑 Войти
+                        </a>
+                        <a href="{% url 'register' %}" class="btn btn-secondary">
+                            👤 Регистрация
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Create Room Section -->
+        {% if user.is_authenticated %}
+            <div class="create-room-section">
+                <a href="{% url 'create_room' %}" class="btn create-room-btn">
+                    🚀 Создать новую комнату
+                </a>
+            </div>
+        {% else %}
+            <div class="guest-notice">
+                <p>🔒 Для создания комнат и отправки сообщений необходимо авторизоваться</p>
+                <div class="auth-buttons">
+                    <a href="{% url 'login' %}" class="btn btn-primary">
+                        🔑 Войти в систему
+                    </a>
+                    <a href="{% url 'register' %}" class="btn btn-outline">
+                        👤 Создать аккаунт
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Rooms Grid -->
+        {% if rooms %}
+            <div class="rooms-grid">
+                {% for room in rooms %}
+                    <div class="room-card">
+                        <div class="room-header">
+                            <a href="{% url 'room_detail' room.id %}" class="room-title">
+                                {{ room.name }}
+                            </a>
+                            <div class="room-stats">
+                                <span class="stat-badge">👥 {{ room.members.count }}</span>
+                                <span class="stat-badge">💬 {{ room.messages.count }}</span>
+                            </div>
+                        </div>
+                        
+                        <p class="room-description">
+                            {{ room.description|default:"Комната для общения и обмена мнениями" }}
+                        </p>
+                        
+                        <div class="room-meta">
+                            <div class="meta-item">
+                                <span>👤</span>
+                                <span>{{ room.created_by.username }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span>📅</span>
+                                <span>{{ room.created_at|date:"d.m.Y" }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span>🕐</span>
+                                <span>{{ room.created_at|date:"H:i" }}</span>
+                            </div>
+                            {% if room.is_private %}
+                                <div class="meta-item">
+                                    <span>🔒</span>
+                                    <span>Приватная</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="room-actions">
+                            <a href="{% url 'room_detail' room.id %}" class="btn btn-sm btn-chat">
+                                💬 Войти в чат
+                            </a>
+                            {% if user.is_authenticated and user == room.created_by or user.is_superuser %}
+                                <a href="{% url 'delete_room' room.id %}" class="btn btn-sm btn-delete" 
+                                   onclick="return confirm('Вы уверены, что хотите удалить комнату \{{ room.name }}\ Это действие нельзя отменить.');">
+                                     Удалить
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h2>😴 Пока здесь тихо...</h2>
+                <p>{% if user.is_authenticated %}Создайте первую комнату и начните общение!{% else %}Войдите в систему, чтобы создать первую комнату{% endif %}</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'create_room' %}" class="btn create-room-btn">
+                        🚀 Создать первую комнату
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <!-- Footer -->
+        <div class="footer">
+        
+        </div>
+    </div>
+
+    <script>
+        // Подтверждение удаления комнаты
+        function confirmDelete(roomName) {
+            return confirm('Вы уверены, что хотите удалить комнату "' + roomName + '"?\n\nВсе сообщения и данные этой комнаты будут безвозвратно удалены.');
+        }
+
+        // Добавляем обработчики для всех кнопок удаления
+        document.querySelectorAll('.btn-delete').forEach(function(button) {
+            button.addEventListener('click', function(e) {
+                const roomCard = this.closest('.room-card');
+                const roomName = roomCard.querySelector('.room-title').textContent;
+                if (!confirmDelete(roomName)) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Анимация появления карточек
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.room-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
