@@ -24,12 +24,12 @@
             
             <div class="form-group">
                 <label for="id_username">👤 Имя пользователя:</label>
-                <input type="text" name="username" id="id_username" class="form-control" required autofocus>
+                {{ form.username }}
             </div>
             
             <div class="form-group">
                 <label for="id_password">🔒 Пароль:</label>
-                <input type="password" name="password" id="id_password" class="form-control" required>
+                {{ form.password }}
             </div>
             
             <button type="submit" class="submit-btn">Войти</button>
