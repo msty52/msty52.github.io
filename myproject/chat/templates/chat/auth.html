@@ -1,232 +1,527 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>{% if auth_type == 'register' %}Регистрация{% else %}Вход{% endif %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат-комнаты | Общение в реальном времени</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            color: #333;
+            line-height: 1.6;
         }
-        
+
         .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            width: 100%;
-            max-width: 450px;
-            margin: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        
+
+        /* Header */
         .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Main Content */
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
             text-align: center;
             margin-bottom: 30px;
         }
-        
-        .header h1 {
+
+        .welcome-section h2 {
             color: #333;
-            margin: 0 0 10px 0;
-            font-size: 2.2em;
-            font-weight: 300;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
         }
-        
-        .header p {
+
+        .welcome-section p {
             color: #666;
-            margin: 0;
-            font-size: 1.1em;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
         }
-        
-        .form-group {
-            margin-bottom: 20px;
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .form-control::placeholder {
-            color: #a0a0a0;
-        }
-        
+
         .btn {
-            display: inline-block;
-            padding: 14px 30px;
+            padding: 12px 30px;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
             text-align: center;
             transition: all 0.3s ease;
-            width: 100%;
+            display: inline-block;
         }
-        
+
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #4a6cf7;
             color: white;
         }
-        
+
         .btn-primary:hover {
+            background: #3a5ce5;
             transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(102, 126, 234, 0.4);
         }
-        
+
         .btn-secondary {
-            background: #f8f9fa;
-            color: #333;
-            border: 2px solid #e1e5e9;
-            margin-top: 15px;
+            background: #6c757d;
+            color: white;
         }
-        
+
         .btn-secondary:hover {
-            background: #e9ecef;
-            border-color: #667eea;
+            background: #5a6268;
+            transform: translateY(-2px);
         }
-        
-        .error {
-            background: #ffebee;
-            color: #c62828;
-            padding: 12px 15px;
+
+        /* Messages */
+        .alert {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px 20px;
             border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #f44336;
-        }
-        
-        .success {
-            background: #e8f5e8;
-            color: #2e7d32;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #4caf50;
-        }
-        
-        .form-icon {
+            margin-bottom: 25px;
             text-align: center;
-            margin-bottom: 10px;
         }
-        
-        .form-icon span {
-            font-size: 3em;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+
+        .guest-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 25px;
         }
-        
-        .auth-switch {
+
+        .guest-notice p {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        /* Rooms */
+        .rooms-section {
+            margin-top: 30px;
+        }
+
+        .room-card {
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .room-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .room-members {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .room-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .room-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .room-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        /* Forms */
+        .auth-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4a6cf7;
+        }
+
+        .form-help {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .form-actions .btn {
+            flex: 1;
+        }
+
+        .form-links {
             text-align: center;
             margin-top: 20px;
-            color: #666;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
         }
-        
-        .auth-switch a {
-            color: #667eea;
+
+        .form-links a {
+            color: #4a6cf7;
+            text-decoration: none;
+        }
+
+        .form-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        /* Back link */
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4a6cf7;
             text-decoration: none;
             font-weight: 500;
         }
-        
-        .auth-switch a:hover {
+
+        .back-link:hover {
             text-decoration: underline;
-        }
-        
-        .errorlist {
-            list-style: none;
-            padding: 0;
-            margin: 5px 0 0 0;
-            color: #d32f2f;
-            font-size: 0.9em;
-        }
-        
-        .errorlist li {
-            background: #ffebee;
-            padding: 5px 10px;
-            border-radius: 4px;
-            margin-bottom: 5px;
-            border-left: 3px solid #f44336;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <div class="header">
-            <div class="form-icon">
-                <span>{% if auth_type == 'register' %}👤{% else %}🔐{% endif %}</span>
-            </div>
-            <h1>{% if auth_type == 'register' %}Регистрация{% else %}Вход{% endif %}</h1>
-            <p>{% if auth_type == 'register' %}Создайте новый аккаунт{% else %}Войдите в свой аккаунт{% endif %}</p>
+            <h1>Чат-комнаты</h1>
+            <p>Общайтесь в реальном времени с друзьями и коллегами</p>
         </div>
-        
-        {% if messages %}
-            {% for message in messages %}
-                <div class="{% if message.tags == 'error' %}error{% else %}success{% endif %}">
-                    {{ message }}
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Главная страница -->
+            <div id="homePage">
+                <!-- Welcome Section -->
+                <div class="welcome-section">
+                    <h2>Добро пожаловать!</h2>
+                    <p>Присоединяйтесь к нашему сообществу</p>
+                    <div class="auth-buttons">
+                        <button onclick="showLogin()" class="btn btn-primary">Войти</button>
+                        <button onclick="showRegister()" class="btn btn-secondary">Регистрация</button>
+                    </div>
                 </div>
-            {% endfor %}
-        {% endif %}
-        
-        <form method="post">
-            {% csrf_token %}
-            
-            {% for field in form %}
-                <div class="form-group">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}
-                        <ul class="errorlist">
-                            {% for error in field.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    {% if field.help_text %}
-                        <div style="font-size: 0.85em; color: #666; margin-top: 5px;">
-                            {{ field.help_text }}
+
+                <!-- Logout Message -->
+                <div class="alert" id="logoutMessage">
+                    Вы успешно вышли из системы.
+                </div>
+
+                <!-- Guest Notice -->
+                <div class="guest-notice">
+                    <p>Для создания комнат и отправки сообщений необходимо авторизоваться</p>
+                    <div class="auth-buttons">
+                        <button onclick="showLogin()" class="btn btn-primary">Войти в систему</button>
+                        <button onclick="showRegister()" class="btn btn-secondary">Создать аккаунт</button>
+                    </div>
+                </div>
+
+                <!-- Rooms Section -->
+                <div class="rooms-section">
+                    <!-- Room 1 -->
+                    <div class="room-card">
+                        <div class="room-header">
+                            <div class="room-title">Чат</div>
+                            <div class="room-members">👥 22</div>
                         </div>
-                    {% endif %}
+                        <p class="room-description">
+                            Комната для общения и обмена мнениями
+                        </p>
+                        <div class="room-meta">
+                            <div class="meta-item">
+                                <strong>1.</strong>
+                                <span>[msty]</span>
+                                <span>[17.10.2025]</span>
+                                <span>[23:37]</span>
+                            </div>
+                        </div>
+                        <div class="room-actions">
+                            <button onclick="showLogin()" class="btn btn-success btn-sm">Войти в чат</button>
+                        </div>
+                    </div>
                 </div>
-            {% endfor %}
-            
-            <button type="submit" class="btn btn-primary">
-                {% if auth_type == 'register' %}🚀 Зарегистрироваться{% else %}🔑 Войти{% endif %}
-            </button>
-            
-            <a href="{% url 'home' %}" class="btn btn-secondary">
-                ← На главную
-            </a>
-        </form>
-        
-        <div class="auth-switch">
-            {% if auth_type == 'register' %}
-                Уже есть аккаунт? <a href="{% url 'login' %}">Войдите</a>
-            {% else %}
-                Нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйтесь</a>
-            {% endif %}
+            </div>
+
+            <!-- Страница входа -->
+            <div id="loginPage" class="hidden">
+                <a href="#" onclick="showHome()" class="back-link">← На главную</a>
+                <h2 style="text-align: center; margin-bottom: 30px; color: #333;">Вход</h2>
+                <p style="text-align: center; color: #666; margin-bottom: 30px;">Войдите в свой аккаунт</p>
+                
+                <div class="auth-form">
+                    <div class="form-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" placeholder="Введите имя пользователя">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Введите пароль">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button onclick="performLogin()" class="btn btn-primary">Войти</button>
+                        <button onclick="showHome()" class="btn btn-secondary">На главную</button>
+                    </div>
+                    
+                    <div class="form-links">
+                        Нет аккаунта? <a href="#" onclick="showRegister()">Зарегистрируйтесь</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Страница регистрации -->
+            <div id="registerPage" class="hidden">
+                <a href="#" onclick="showHome()" class="back-link">← На главную</a>
+                <h2 style="text-align: center; margin-bottom: 30px; color: #333;">Регистрация</h2>
+                <p style="text-align: center; color: #666; margin-bottom: 30px;">Создайте новый аккаунт</p>
+                
+                <div class="auth-form">
+                    <div class="form-group">
+                        <label for="regUsername">Username</label>
+                        <input type="text" id="regUsername" placeholder="Придумайте имя пользователя">
+                        <div class="form-help">
+                            Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regEmail">Email</label>
+                        <input type="email" id="regEmail" placeholder="Введите ваш email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regPassword">Password</label>
+                        <input type="password" id="regPassword" placeholder="Придумайте пароль">
+                        <div class="form-help">
+                            <div>• Your password can't be too similar to your other personal information.</div>
+                            <div>• Your password must contain at least 8 characters.</div>
+                            <div>• Your password can't be a commonly used password.</div>
+                            <div>• Your password can't be entirely numeric.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="regPasswordConfirm">Password confirmation</label>
+                        <input type="password" id="regPasswordConfirm" placeholder="Повторите пароль">
+                        <div class="form-help">
+                            Enter the same password as before, for verification.
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button onclick="performRegister()" class="btn btn-primary">Зарегистрироваться</button>
+                        <button onclick="showHome()" class="btn btn-secondary">На главную</button>
+                    </div>
+                    
+                    <div class="form-links">
+                        Уже есть аккаунт? <a href="#" onclick="showLogin()">Войдите</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2024 Чат-комнаты</p>
         </div>
     </div>
 
     <script>
-        // Автофокус на первом поле
-        document.querySelector('.form-control').focus();
+        // Показ главной страницы
+        function showHome() {
+            document.getElementById('homePage').classList.remove('hidden');
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('registerPage').classList.add('hidden');
+        }
+
+        // Показ страницы входа
+        function showLogin() {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('registerPage').classList.add('hidden');
+        }
+
+        // Показ страницы регистрации
+        function showRegister() {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('registerPage').classList.remove('hidden');
+        }
+
+        // Функция входа
+        function performLogin() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                alert('Пожалуйста, заполните все поля');
+                return;
+            }
+            
+            // В реальном приложении здесь был бы запрос к серверу
+            alert(`Вход выполнен!\nUsername: ${username}\nPassword: ${password}`);
+            
+            // Показываем главную страницу как авторизованный пользователь
+            showHome();
+            document.getElementById('logoutMessage').classList.add('hidden');
+            document.querySelector('.guest-notice').classList.add('hidden');
+        }
+
+        // Функция регистрации
+        function performRegister() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+            
+            if (!username || !email || !password || !passwordConfirm) {
+                alert('Пожалуйста, заполните все поля');
+                return;
+            }
+            
+            if (password !== passwordConfirm) {
+                alert('Пароли не совпадают');
+                return;
+            }
+            
+            if (password.length < 8) {
+                alert('Пароль должен содержать минимум 8 символов');
+                return;
+            }
+            
+            // В реальном приложении здесь был бы запрос к серверу
+            alert(`Регистрация успешна!\nUsername: ${username}\nEmail: ${email}`);
+            
+            // Переходим на страницу входа
+            showLogin();
+        }
+
+        // Скрываем сообщение о выходе при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('logoutMessage').classList.add('hidden');
+        });
     </script>
 </body>
 </html>
