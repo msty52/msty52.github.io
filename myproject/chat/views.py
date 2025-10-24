@@ -1,17 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import IntegrityError
 from django.contrib import messages
+from django.http import JsonResponse
+from django.db.models import Count, Q
 from .models import ChatRoom, ChatMessage, RoomMember
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
-
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
-from .models import Room, Message, User
-from django.db.models import Count
 
 def room_detail(request, room_id):
     room = get_object_or_404(Room, id=room_id)
@@ -184,3 +180,4 @@ def delete_room(request, room_id):
         'room': room,
 
     })
+
