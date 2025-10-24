@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная - Chat App{% endblock %}
+
+{% block header_title %}💬 Комнаты чата{% endblock %}
+
+{% block content %}
+<div class="rooms-container">
+    <div class="welcome-section">
+        {% if user.is_authenticated %}
+            <h2>Добро пожаловать, {{ user.username }}! 👋</h2>
+            <p>Выберите комнату для общения или создайте новую</p>
+        {% else %}
+            <h2>Добро пожаловать в Chat App! 👋</h2>
+            <p>Войдите или зарегистрируйтесь, чтобы начать общение</p>
+        {% endif %}
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="rooms-grid">
+        {% for room in rooms %}
+        <div class="room-card">
+            <h3>{{ room.name }}</h3>
+            <p class="room-description">{{ room.description|default:"Без описания" }}</p>
+            <div class="room-meta">
+                <span>👥 Участников: {{ room.participants_count }}</span>
+                <span>💬 Сообщений: {{ room.messages_count }}</span>
+            </div>
+            <a href="{% url 'room_detail' room.id %}" class="join-btn">Войти в комнату</a>
+            
+            {% if user.is_staff or user == room.created_by %}
+            <div class="room-actions">
+                <button onclick="deleteRoom({{ room.id }})" class="delete-btn">🗑️ Удалить</button>
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="no-rooms">
+            <h3>Пока нет комнат 😔</h3>
+            <p>Создайте первую комнату для общения!</p>
+            <a href="{% url 'create_room' %}" class="create-first-room">Создать комнату</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="auth-required">
+        <div class="auth-message">
+            <h3>🔒 Требуется авторизация</h3>
+            <p>Чтобы просматривать комнаты чата, пожалуйста, войдите в систему или зарегистрируйтесь</p>
+            <div class="auth-buttons">
+                <a href="{% url 'login' %}" class="auth-btn login-btn">Войти</a>
+                <a href="{% url 'register' %}" class="auth-btn register-btn">Регистрация</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function deleteRoom(roomId) {
+    if (confirm('Вы уверены, что хотите удалить эту комнату?')) {
+        fetch(`/room/${roomId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+</script>
+{% endblock %}
