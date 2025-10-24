@@ -46,6 +46,13 @@
             margin-bottom: 20px;
         }
         
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
         .form-control {
             width: 100%;
             padding: 12px 15px;
@@ -167,7 +174,10 @@
             const password = document.getElementById('password').value;
             
             if (username && password) {
-                alert('Вход выполнен! Демо-версия');
+                // Сохраняем пользователя в localStorage
+                localStorage.setItem('currentUser', username);
+                
+                // Переходим на главную страницу
                 window.location.href = 'index.html';
             }
         });
