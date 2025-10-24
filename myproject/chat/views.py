@@ -7,6 +7,66 @@ from django.contrib import messages
 from .models import ChatRoom, ChatMessage, RoomMember
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
 
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from .models import Room, Message, User
+from django.db.models import Count
+
+def room_detail(request, room_id):
+    room = get_object_or_404(Room, id=room_id)
+    
+    # Статистика для комнаты
+    stats = {
+        'participants_count': room.participants.count(),
+        'messages_count': room.messages.count(),
+        'links_count': room.messages.filter(content__contains='http').count(),
+        'media_count': room.messages.filter(content__contains='[media]').count(),
+        'files_count': room.messages.filter(content__contains='[file]').count(),
+        'music_count': room.messages.filter(content__contains='[music]').count(),
+        'voice_messages_count': room.messages.filter(content__contains='[voice]').count(),
+    }
+    
+    messages = room.messages.all().order_by('timestamp')[:50]
+    
+    context = {
+        'room': room,
+        'messages': messages,
+        **stats
+    }
+    return render(request, 'room_detail.html', context)
+
+@user_passes_test(lambda u: u.is_staff)
+def admin_dashboard(request):
+    total_rooms = Room.objects.count()
+    total_users = User.objects.count()
+    active_sessions = 0  # Здесь можно добавить логику подсчета активных сессий
+    
+    context = {
+        'total_rooms': total_rooms,
+        'total_users': total_users,
+        'active_sessions': active_sessions,
+    }
+    return render(request, 'admin_dashboard.html', context)
+
+@user_passes_test(lambda u: u.is_staff)
+def delete_room(request, room_id):
+    if request.method == 'POST':
+        room = get_object_or_404(Room, id=room_id)
+        room.delete()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})
+
+@user_passes_test(lambda u: u.is_staff)
+def ban_user(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        user = get_object_or_404(User, username=username)
+        user.is_active = False
+        user.save()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
+
 def home(request):
     rooms = ChatRoom.objects.all()
     return render(request, 'chat/index.html', {
@@ -122,4 +182,5 @@ def delete_room(request, room_id):
     
     return render(request, 'chat/delete_room.html', {
         'room': room,
+
     })
