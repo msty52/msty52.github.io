@@ -1,177 +1,232 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход - Chat App</title>
+    <title>{% if auth_type == 'register' %}Регистрация{% else %}Вход{% endif %}</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
         }
-
-        .auth-container {
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
             width: 100%;
             max-width: 450px;
+            margin: 20px;
         }
-
-        .auth-form {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .auth-header {
+        
+        .header {
             text-align: center;
             margin-bottom: 30px;
         }
-
-        .auth-header h2 {
-            color: #2c3e50;
-            margin-bottom: 8px;
-            font-size: 1.8rem;
+        
+        .header h1 {
+            color: #333;
+            margin: 0 0 10px 0;
+            font-size: 2.2em;
+            font-weight: 300;
         }
-
-        .auth-header p {
-            color: #7f8c8d;
-            font-size: 1.1rem;
+        
+        .header p {
+            color: #666;
+            margin: 0;
+            font-size: 1.1em;
         }
-
+        
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #2c3e50;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
+        
         .form-control {
             width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e1e8ed;
-            border-radius: 10px;
-            font-size: 1rem;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
             transition: all 0.3s ease;
-            background: #f8f9fa;
-            color: #2c3e50;
-            font-family: inherit;
+            box-sizing: border-box;
         }
-
+        
         .form-control:focus {
             outline: none;
-            border-color: #3498db;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-
-        .submit-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
+        
+        .form-control::placeholder {
+            color: #a0a0a0;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 14px 30px;
             border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .submit-btn:hover {
-            background: linear-gradient(135deg, #2980b9, #3498db);
-            transform: translateY(-2px);
-        }
-
-        .auth-links {
+            text-decoration: none;
             text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e1e8ed;
+            transition: all 0.3s ease;
+            width: 100%;
         }
-
-        .auth-links p {
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e1e5e9;
+            margin-top: 15px;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f44336;
+        }
+        
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .form-icon {
+            text-align: center;
             margin-bottom: 10px;
-            color: #7f8c8d;
         }
-
-        .auth-links a {
-            color: #3498db;
+        
+        .form-icon span {
+            font-size: 3em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .auth-switch {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        .auth-switch a {
+            color: #667eea;
             text-decoration: none;
             font-weight: 500;
         }
-
-        .auth-links a:hover {
-            color: #2980b9;
+        
+        .auth-switch a:hover {
             text-decoration: underline;
         }
-
-        .alert {
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-weight: 500;
-            border-left: 4px solid;
+        
+        .errorlist {
+            list-style: none;
+            padding: 0;
+            margin: 5px 0 0 0;
+            color: #d32f2f;
+            font-size: 0.9em;
         }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left-color: #dc3545;
-        }
-
-        @media (max-width: 768px) {
-            .auth-form {
-                padding: 30px 20px;
-            }
+        
+        .errorlist li {
+            background: #ffebee;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            border-left: 3px solid #f44336;
         }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <div class="auth-form">
-            <div class="auth-header">
-                <h2>Вход в аккаунт</h2>
-                <p>Войдите в свой аккаунт чтобы продолжить</p>
-
-            <form method="post">
-                
-                <div class="form-group">
-                    <label>👤 Имя пользователя:</label>
-                    <input type="text" name="username" class="form-control" required 
-                           placeholder="Введите имя пользователя">
-                </div>
-                
-                <div class="form-group">
-                    <label>🔒 Пароль:</label>
-                    <input type="password" name="password" class="form-control" required 
-                           placeholder="Введите пароль">
-                </div>
-                
-                <button type="submit" class="submit-btn">Войти</button>
-            </form>
-            
-            <div class="auth-links">
-                <p>Нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйтесь</a></p>
-                <p><a href="{% url 'home' %}">← Вернуться на главную</a></p>
+    <div class="container">
+        <div class="header">
+            <div class="form-icon">
+                <span>{% if auth_type == 'register' %}👤{% else %}🔐{% endif %}</span>
             </div>
+            <h1>{% if auth_type == 'register' %}Регистрация{% else %}Вход{% endif %}</h1>
+            <p>{% if auth_type == 'register' %}Создайте новый аккаунт{% else %}Войдите в свой аккаунт{% endif %}</p>
+        </div>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <ul class="errorlist">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {% if field.help_text %}
+                        <div style="font-size: 0.85em; color: #666; margin-top: 5px;">
+                            {{ field.help_text }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            
+            <button type="submit" class="btn btn-primary">
+                {% if auth_type == 'register' %}🚀 Зарегистрироваться{% else %}🔑 Войти{% endif %}
+            </button>
+            
+            <a href="{% url 'home' %}" class="btn btn-secondary">
+                ← На главную
+            </a>
+        </form>
+        
+        <div class="auth-switch">
+            {% if auth_type == 'register' %}
+                Уже есть аккаунт? <a href="{% url 'login' %}">Войдите</a>
+            {% else %}
+                Нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйтесь</a>
+            {% endif %}
         </div>
     </div>
+
+    <script>
+        // Автофокус на первом поле
+        document.querySelector('.form-control').focus();
+    </script>
 </body>
 </html>
