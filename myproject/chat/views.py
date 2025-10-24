@@ -6,6 +6,7 @@ from django.db import IntegrityError
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Count, Q
+from datetime import datetime, timedelta
 from .models import ChatRoom, ChatMessage, RoomMember
 from .forms import CustomUserCreationForm, CustomAuthenticationForm
 
@@ -19,10 +20,15 @@ def register_view(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, f'Добро пожаловать, {user.username}! Регистрация прошла успешно.')
-            return redirect('home')
+            try:
+                user = form.save()
+                login(request, user)
+                messages.success(request, f'Добро пожаловать, {user.username}! Регистрация прошла успешно.')
+                return redirect('home')
+            except IntegrityError:
+                messages.error(request, 'Пользователь с таким именем уже существует.')
+            except Exception as e:
+                messages.error(request, f'Произошла ошибка при регистрации: {str(e)}')
         else:
             messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
     else:
@@ -43,9 +49,14 @@ def login_view(request):
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
             if user is not None:
-                login(request, user)
-                messages.success(request, f'С возвращением, {username}!')
-                return redirect('home')
+                if user.is_active:
+                    login(request, user)
+                    messages.success(request, f'С возвращением, {username}!')
+                    return redirect('home')
+                else:
+                    messages.error(request, 'Ваш аккаунт заблокирован.')
+            else:
+                messages.error(request, 'Неверное имя пользователя или пароль.')
         else:
             messages.error(request, 'Неверное имя пользователя или пароль.')
     else:
@@ -104,26 +115,37 @@ def room_detail(request, room_id):
 @login_required
 def create_room(request):
     if request.method == 'POST':
-        name = request.POST.get('name')
-        description = request.POST.get('description', '')
+        name = request.POST.get('name', '').strip()
+        description = request.POST.get('description', '').strip()
         
-        if name and len(name.strip()) > 0:
-            try:
-                room = ChatRoom.objects.create(
-                    name=name.strip(),
-                    description=description.strip(),
-                    created_by=request.user
-                )
-                # Создатель автоматически становится участником
-                RoomMember.objects.create(user=request.user, room=room)
-                messages.success(request, f'Комната "{room.name}" успешно создана!')
-                return redirect('room_detail', room_id=room.id)
-            except IntegrityError:
-                messages.error(request, 'Комната с таким названием уже существует.')
-            except Exception as e:
-                messages.error(request, f'Ошибка при создании комнаты: {str(e)}')
-        else:
+        if not name:
             messages.error(request, 'Название комнаты не может быть пустым.')
+            return render(request, 'create_room.html')
+        
+        if len(name) > 100:
+            messages.error(request, 'Название комнаты слишком длинное (максимум 100 символов).')
+            return render(request, 'create_room.html')
+        
+        try:
+            # Проверяем, существует ли комната с таким именем
+            if ChatRoom.objects.filter(name=name).exists():
+                messages.error(request, 'Комната с таким названием уже существует.')
+                return render(request, 'create_room.html')
+                
+            room = ChatRoom.objects.create(
+                name=name,
+                description=description,
+                created_by=request.user
+            )
+            # Создатель автоматически становится участником
+            RoomMember.objects.create(user=request.user, room=room)
+            messages.success(request, f'Комната "{room.name}" успешно создана!')
+            return redirect('room_detail', room_id=room.id)
+            
+        except IntegrityError:
+            messages.error(request, 'Комната с таким названием уже существует.')
+        except Exception as e:
+            messages.error(request, f'Ошибка при создании комнаты: {str(e)}')
     
     return render(request, 'create_room.html')
 
@@ -154,8 +176,8 @@ def delete_room(request, room_id):
 def admin_dashboard(request):
     total_rooms = ChatRoom.objects.count()
     total_users = User.objects.count()
-    # Простая логика для активных сессий (пользователи, заходившие за последние 24 часа)
-    from datetime import datetime, timedelta
+    
+    # Пользователи, заходившие за последние 24 часа
     active_sessions = User.objects.filter(
         last_login__gte=datetime.now() - timedelta(hours=24)
     ).count()
@@ -166,11 +188,15 @@ def admin_dashboard(request):
         user_count=Count('roommember')
     ).order_by('-message_count')[:5]
     
+    # Последние зарегистрированные пользователи
+    recent_users = User.objects.order_by('-date_joined')[:5]
+    
     context = {
         'total_rooms': total_rooms,
         'total_users': total_users,
         'active_sessions': active_sessions,
         'top_rooms': top_rooms,
+        'recent_users': recent_users,
     }
     return render(request, 'admin_dashboard.html', context)
 
@@ -178,6 +204,9 @@ def admin_dashboard(request):
 def admin_ban_user(request):
     if request.method == 'POST':
         username = request.POST.get('username')
+        if not username:
+            return JsonResponse({'success': False, 'error': 'Имя пользователя не указано'})
+        
         try:
             user = User.objects.get(username=username)
             if user == request.user:
@@ -195,6 +224,9 @@ def admin_ban_user(request):
 def admin_unban_user(request):
     if request.method == 'POST':
         username = request.POST.get('username')
+        if not username:
+            return JsonResponse({'success': False, 'error': 'Имя пользователя не указано'})
+        
         try:
             user = User.objects.get(username=username)
             user.is_active = True
@@ -209,7 +241,6 @@ def admin_unban_user(request):
 def admin_clear_old_messages(request):
     if request.method == 'POST':
         try:
-            from datetime import datetime, timedelta
             # Удаляем сообщения старше 30 дней
             old_date = datetime.now() - timedelta(days=30)
             deleted_count = ChatMessage.objects.filter(
@@ -239,34 +270,64 @@ def admin_room_list(request):
     ).order_by('-created_at')
     return render(request, 'admin_room_list.html', {'rooms': rooms})
 
+@user_passes_test(lambda u: u.is_staff)
+def admin_delete_user(request, user_id):
+    if request.method == 'POST':
+        try:
+            user = get_object_or_404(User, id=user_id)
+            if user == request.user:
+                messages.error(request, 'Вы не можете удалить свой аккаунт!')
+            else:
+                username = user.username
+                user.delete()
+                messages.success(request, f'Пользователь {username} удален.')
+        except Exception as e:
+            messages.error(request, f'Ошибка при удалении пользователя: {str(e)}')
+    
+    return redirect('admin_user_list')
+
 # API views
 @login_required
 def send_message(request, room_id):
     if request.method == 'POST':
         room = get_object_or_404(ChatRoom, id=room_id)
-        message_text = request.POST.get('message') or request.JSON.get('content', '')
         
-        if message_text and len(message_text.strip()) > 0:
-            # Проверяем, является ли пользователь участником комнаты
-            if not RoomMember.objects.filter(user=request.user, room=room).exists():
-                return JsonResponse({'success': False, 'error': 'Вы не участник этой комнаты'})
-            
-            try:
-                message = ChatMessage.objects.create(
-                    room=room,
-                    user=request.user,
-                    message=message_text.strip()
-                )
-                return JsonResponse({
-                    'success': True, 
-                    'message_id': message.id,
-                    'username': request.user.username,
-                    'timestamp': message.timestamp.strftime('%H:%M')
-                })
-            except Exception as e:
-                return JsonResponse({'success': False, 'error': str(e)})
+        # Получаем текст сообщения из разных источников
+        if request.content_type == 'application/json':
+            import json
+            data = json.loads(request.body)
+            message_text = data.get('content', '')
         else:
+            message_text = request.POST.get('message', '')
+        
+        message_text = message_text.strip()
+        
+        if not message_text:
             return JsonResponse({'success': False, 'error': 'Сообщение не может быть пустым'})
+        
+        if len(message_text) > 1000:
+            return JsonResponse({'success': False, 'error': 'Сообщение слишком длинное (максимум 1000 символов)'})
+        
+        # Проверяем, является ли пользователь участником комнаты
+        if not RoomMember.objects.filter(user=request.user, room=room).exists():
+            return JsonResponse({'success': False, 'error': 'Вы не участник этой комнаты'})
+        
+        try:
+            message = ChatMessage.objects.create(
+                room=room,
+                user=request.user,
+                message=message_text
+            )
+            return JsonResponse({
+                'success': True, 
+                'message_id': message.id,
+                'username': request.user.username,
+                'is_admin': request.user.is_staff,
+                'timestamp': message.timestamp.strftime('%H:%M'),
+                'message_content': message_text
+            })
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
     
     return JsonResponse({'success': False, 'error': 'Неверный метод запроса'})
 
@@ -275,8 +336,13 @@ def get_room_messages(request, room_id):
     if request.method == 'GET':
         room = get_object_or_404(ChatRoom, id=room_id)
         limit = int(request.GET.get('limit', 50))
+        offset = int(request.GET.get('offset', 0))
         
-        messages = ChatMessage.objects.filter(room=room).order_by('-timestamp')[:limit]
+        # Проверяем, является ли пользователь участником комнаты
+        if not RoomMember.objects.filter(user=request.user, room=room).exists():
+            return JsonResponse({'success': False, 'error': 'Доступ запрещен'})
+        
+        messages = ChatMessage.objects.filter(room=room).order_by('-timestamp')[offset:offset + limit]
         
         messages_data = []
         for msg in messages:
@@ -291,7 +357,8 @@ def get_room_messages(request, room_id):
         
         return JsonResponse({
             'success': True,
-            'messages': list(reversed(messages_data))  # Возвращаем в правильном порядке
+            'messages': list(reversed(messages_data)),  # Возвращаем в правильном порядке
+            'has_more': ChatMessage.objects.filter(room=room).count() > offset + limit
         })
     
     return JsonResponse({'success': False, 'error': 'Неверный метод запроса'})
@@ -318,20 +385,113 @@ def leave_room(request, room_id):
     
     return JsonResponse({'success': False, 'error': 'Неверный метод запроса'})
 
+@login_required
+def edit_room(request, room_id):
+    room = get_object_or_404(ChatRoom, id=room_id)
+    
+    # Проверяем права - только создатель или админ может редактировать
+    if not (request.user == room.created_by or request.user.is_staff):
+        messages.error(request, 'У вас нет прав для редактирования этой комнаты.')
+        return redirect('room_detail', room_id=room_id)
+    
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        description = request.POST.get('description', '').strip()
+        
+        if not name:
+            messages.error(request, 'Название комнаты не может быть пустым.')
+            return render(request, 'edit_room.html', {'room': room})
+        
+        try:
+            # Проверяем, не занято ли имя другой комнатой
+            if ChatRoom.objects.filter(name=name).exclude(id=room_id).exists():
+                messages.error(request, 'Комната с таким названием уже существует.')
+                return render(request, 'edit_room.html', {'room': room})
+                
+            room.name = name
+            room.description = description
+            room.save()
+            
+            messages.success(request, f'Комната "{room.name}" успешно обновлена!')
+            return redirect('room_detail', room_id=room_id)
+            
+        except Exception as e:
+            messages.error(request, f'Ошибка при обновлении комнаты: {str(e)}')
+    
+    return render(request, 'edit_room.html', {'room': room})
+
 # Вспомогательные views
 @login_required
 def user_profile(request):
     user_rooms = RoomMember.objects.filter(user=request.user).select_related('room')
     user_messages = ChatMessage.objects.filter(user=request.user).count()
+    rooms_created = ChatRoom.objects.filter(created_by=request.user).count()
     
     context = {
         'user_rooms': user_rooms,
         'user_messages': user_messages,
+        'rooms_created': rooms_created,
     }
     return render(request, 'user_profile.html', context)
 
+@login_required
+def update_profile(request):
+    if request.method == 'POST':
+        # Здесь можно добавить логику обновления профиля
+        # Например, смену пароля, email и т.д.
+        messages.info(request, 'Функция обновления профиля в разработке.')
+    
+    return redirect('user_profile')
+
+# Обработчики ошибок
 def handler404(request, exception):
     return render(request, '404.html', status=404)
 
 def handler500(request):
     return render(request, '500.html', status=500)
+
+def handler403(request, exception):
+    return render(request, '403.html', status=403)
+
+def handler400(request, exception):
+    return render(request, '400.html', status=400)
+
+# Утилиты
+@login_required
+def search_rooms(request):
+    query = request.GET.get('q', '').strip()
+    if query:
+        rooms = ChatRoom.objects.filter(
+            Q(name__icontains=query) | Q(description__icontains=query)
+        ).annotate(
+            participants_count=Count('roommember'),
+            messages_count=Count('chatmessage')
+        )[:20]
+    else:
+        rooms = ChatRoom.objects.none()
+    
+    return render(request, 'search_results.html', {
+        'rooms': rooms,
+        'query': query,
+        'results_count': rooms.count()
+    })
+
+@login_required
+def user_activity(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    
+    # Показываем активность только для своего профиля или для админов
+    if request.user != user and not request.user.is_staff:
+        messages.error(request, 'У вас нет прав для просмотра этого профиля.')
+        return redirect('home')
+    
+    user_messages = ChatMessage.objects.filter(user=user).order_by('-timestamp')[:50]
+    user_rooms = RoomMember.objects.filter(user=user).select_related('room')
+    
+    context = {
+        'profile_user': user,
+        'user_messages': user_messages,
+        'user_rooms': user_rooms,
+        'total_messages': ChatMessage.objects.filter(user=user).count(),
+    }
+    return render(request, 'user_activity.html', context)
