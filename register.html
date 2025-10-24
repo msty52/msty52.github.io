@@ -3,180 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация - Chat App</title>
+    <title>Регистрация</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
             padding: 20px;
+            background-color: #f5f5f5;
         }
-
-        .auth-container {
-            width: 100%;
-            max-width: 450px;
-        }
-
-        .auth-form {
+        
+        .registration-form {
             background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
-        .auth-header {
+        
+        h2 {
             text-align: center;
+            color: #333;
             margin-bottom: 30px;
         }
-
-        .auth-header h2 {
-            color: #2c3e50;
-            margin-bottom: 8px;
-            font-size: 1.8rem;
-        }
-
-        .auth-header p {
-            color: #7f8c8d;
-            font-size: 1.1rem;
-        }
-
+        
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
-
-        .form-group label {
+        
+        label {
             display: block;
-            margin-bottom: 8px;
-            color: #2c3e50;
-            font-weight: 600;
-            font-size: 0.95rem;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
         }
-
-        .form-control {
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"],
+        select {
             width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e1e8ed;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-            color: #2c3e50;
-            font-family: inherit;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
         }
-
-        .form-control:focus {
+        
+        input:focus {
+            border-color: #4CAF50;
             outline: none;
-            border-color: #3498db;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
         }
-
+        
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .checkbox-group input {
+            margin-top: 3px;
+        }
+        
+        .checkbox-group label {
+            font-weight: normal;
+            font-size: 14px;
+        }
+        
         .submit-btn {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #27ae60, #229954);
+            background-color: #4CAF50;
             color: white;
+            padding: 14px;
             border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
+            border-radius: 4px;
+            font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
+            transition: background-color 0.3s;
         }
-
+        
         .submit-btn:hover {
-            background: linear-gradient(135deg, #229954, #27ae60);
-            transform: translateY(-2px);
+            background-color: #45a049;
         }
-
-        .auth-links {
+        
+        .login-link {
             text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e1e8ed;
+            margin-top: 20px;
         }
-
-        .auth-links p {
-            margin-bottom: 10px;
-            color: #7f8c8d;
-        }
-
-        .auth-links a {
-            color: #3498db;
+        
+        .login-link a {
+            color: #4CAF50;
             text-decoration: none;
-            font-weight: 500;
         }
-
-        .auth-links a:hover {
-            color: #2980b9;
+        
+        .login-link a:hover {
             text-decoration: underline;
         }
-
-        .alert {
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-weight: 500;
-            border-left: 4px solid;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left-color: #dc3545;
-        }
-
-        @media (max-width: 768px) {
-            .auth-form {
-                padding: 30px 20px;
-            }
+        
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <div class="auth-form">
-            <div class="auth-header">
-                <h2>Создать аккаунт</h2>
-                <p>Присоединяйтесь к нашему чату!</p>
+    <div class="registration-form">
+        <h2>Создать аккаунт</h2>
+        <form id="registrationForm" action="/register" method="POST">
+            <div class="form-group">
+                <label for="firstName">Имя *</label>
+                <input type="text" id="firstName" name="firstName" required>
+                <div class="error" id="firstNameError">Пожалуйста, введите ваше имя</div>
             </div>
-                
-                <div class="form-group">
-                    <label>👤 Имя пользователя:</label>
-                    <input type="text" name="username" class="form-control" required 
-                           placeholder="Введите имя пользователя">
-                </div>
-                
-                <div class="form-group">
-                    <label>🔒 Пароль:</label>
-                    <input type="password" name="password1" class="form-control" required 
-                           placeholder="Введите пароль">
-                </div>
-                
-                <div class="form-group">
-                    <label>🔒 Подтверждение пароля:</label>
-                    <input type="password" name="password2" class="form-control" required 
-                           placeholder="Повторите пароль">
-                </div>
-                
-                <button type="submit" class="submit-btn">📝 Зарегистрироваться</button>
-            </form>
             
-            <div class="auth-links">
-                <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войдите здесь</a></p>
-                <p><a href="{% url 'home' %}">← Вернуться на главную</a></p>
+            <div class="form-group">
+                <label for="lastName">Фамилия *</label>
+                <input type="text" id="lastName" name="lastName" required>
+                <div class="error" id="lastNameError">Пожалуйста, введите вашу фамилию</div>
             </div>
+            
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" required>
+                <div class="error" id="emailError">Пожалуйста, введите корректный email</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Телефон</label>
+                <input type="tel" id="phone" name="phone" placeholder="+7 (XXX) XXX-XX-XX">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Пароль *</label>
+                <input type="password" id="password" name="password" required minlength="6">
+                <div class="error" id="passwordError">Пароль должен содержать минимум 6 символов</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Подтверждение пароля *</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                <div class="error" id="confirmPasswordError">Пароли не совпадают</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="country">Страна</label>
+                <select id="country" name="country">
+                    <option value="">Выберите страну</option>
+                    <option value="ru">Россия</option>
+                    <option value="kz">Казахстан</option>
+                    <option value="by">Беларусь</option>
+                    <option value="other">Другая</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                    <label for="agreeTerms">
+                        Я соглашаюсь с <a href="/terms" target="_blank">условиями использования</a> 
+                        и <a href="/privacy" target="_blank">политикой конфиденциальности</a> *
+                    </label>
+                </div>
+                <div class="error" id="termsError">Необходимо принять условия использования</div>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="newsletter" name="newsletter">
+                    <label for="newsletter">Подписаться на рассылку новостей и специальных предложений</label>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-btn">Зарегистрироваться</button>
+        </form>
+        
+        <div class="login-link">
+            Уже есть аккаунт? <a href="/login">Войти</a>
         </div>
     </div>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let isValid = true;
+            
+            // Проверка имени
+            const firstName = document.getElementById('firstName');
+            if (!firstName.value.trim()) {
+                document.getElementById('firstNameError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('firstNameError').style.display = 'none';
+            }
+            
+            // Проверка фамилии
+            const lastName = document.getElementById('lastName');
+            if (!lastName.value.trim()) {
+                document.getElementById('lastNameError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('lastNameError').style.display = 'none';
+            }
+            
+            // Проверка email
+            const email = document.getElementById('email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email.value)) {
+                document.getElementById('emailError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('emailError').style.display = 'none';
+            }
+            
+            // Проверка пароля
+            const password = document.getElementById('password');
+            if (password.value.length < 6) {
+                document.getElementById('passwordError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('passwordError').style.display = 'none';
+            }
+            
+            // Проверка подтверждения пароля
+            const confirmPassword = document.getElementById('confirmPassword');
+            if (password.value !== confirmPassword.value) {
+                document.getElementById('confirmPasswordError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('confirmPasswordError').style.display = 'none';
+            }
+            
+            // Проверка согласия с условиями
+            const agreeTerms = document.getElementById('agreeTerms');
+            if (!agreeTerms.checked) {
+                document.getElementById('termsError').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('termsError').style.display = 'none';
+            }
+            
+            if (isValid) {
+                // Здесь обычно отправка данных на сервер
+                alert('Регистрация успешна!');
+                // this.submit(); // Раскомментировать для реальной отправки формы
+            }
+        });
+    </script>
 </body>
 </html>
