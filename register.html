@@ -150,17 +150,6 @@
                 <h2>Создать аккаунт</h2>
                 <p>Присоединяйтесь к нашему чату!</p>
             </div>
-
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-error">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            <form method="post">
-                {% csrf_token %}
                 
                 <div class="form-group">
                     <label>👤 Имя пользователя:</label>
