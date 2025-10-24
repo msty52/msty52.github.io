@@ -1,11 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
-from django.db.models import Count
-import json
 
 def home(request):
     if request.user.is_authenticated:
@@ -38,6 +35,8 @@ def register_view(request):
         password1 = request.POST.get('password1', '')
         password2 = request.POST.get('password2', '')
         
+        print(f"Регистрация: {username}")  # Для отладки
+        
         # Валидация
         errors = []
         
@@ -53,7 +52,7 @@ def register_view(request):
         if password1 != password2:
             errors.append('Пароли не совпадают.')
         
-        if len(password1) < 3:  # Упростим для теста
+        if len(password1) < 3:
             errors.append('Пароль должен содержать минимум 3 символа.')
         
         if User.objects.filter(username=username).exists():
@@ -72,6 +71,7 @@ def register_view(request):
         except Exception as e:
             messages.error(request, f'Ошибка: {str(e)}')
     
+    # GET запрос
     return render(request, 'register.html')
 
 def login_view(request):
@@ -82,11 +82,13 @@ def login_view(request):
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
         
+        print(f"Вход: {username}")  # Для отладки
+        
         if not username or not password:
             messages.error(request, 'Все поля обязательны.')
             return render(request, 'auth.html')
         
-        user = authenticate(username=username, password=password)
+        user = authenticate(request, username=username, password=password)
         
         if user is not None:
             login(request, user)
@@ -95,6 +97,7 @@ def login_view(request):
         else:
             messages.error(request, 'Неверное имя пользователя или пароль.')
     
+    # GET запрос
     return render(request, 'auth.html')
 
 @login_required
