@@ -1654,3 +1654,90 @@ input:focus,
     background: linear-gradient(135deg, #8e44ad, #9b59b6);
     transform: translateY(-2px);
 }
+
+/* Добавьте в конец styles.css */
+
+/* Стили для полей формы */
+.form-control {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e1e8ed;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    color: #2c3e50;
+    font-family: inherit;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3498db;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Специфичные стили для полей ввода пароля */
+input[type="password"] {
+    letter-spacing: 1px;
+}
+
+/* Стили для ошибок в формах */
+.errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0 0;
+}
+
+.errorlist li {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    padding: 5px 0;
+    border-left: 3px solid #e74c3c;
+    padding-left: 10px;
+    margin-bottom: 5px;
+}
+
+/* Улучшение отображения help text */
+.help-text ul {
+    margin: 5px 0;
+    padding-left: 20px;
+}
+
+.help-text li {
+    margin-bottom: 3px;
+    font-size: 0.8rem;
+    color: #7f8c8d;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+    .form-control {
+        padding: 12px 14px;
+        font-size: 16px; /* Предотвращает zoom в iOS */
+    }
+    
+    .auth-form {
+        margin: 10px;
+        padding: 25px 20px;
+    }
+}
+
+/* Темная тема для форм */
+@media (prefers-color-scheme: dark) {
+    .form-control {
+        background: #34495e;
+        border-color: #34495e;
+        color: #ecf0f1;
+    }
+    
+    .form-control:focus {
+        background: #2c3e50;
+        border-color: #3498db;
+    }
+    
+    .help-text li {
+        color: #95a5a6;
+    }
+}
