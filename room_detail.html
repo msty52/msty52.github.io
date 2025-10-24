@@ -208,6 +208,132 @@
             max-width: 60%;
             text-align: center;
         }
+    {% extends 'base.html' %}
+
+{% block title %}Комната: {{ room.name }}{% endblock %}
+
+{% block header_title %}
+    Название Чата: {{ room.name }}
+    <div class="stats-toggle">
+        <button class="stats-circle" onclick="toggleStats()">i</button>
+        <div class="stats-popup" id="statsPopup">
+            <h3>Статистика чата</h3>
+            <div class="stats-item">
+                <span>Участники:</span>
+                <span id="statParticipants">{{ room.participants_count }}</span>
+            </div>
+            <div class="stats-item">
+                <span>Сообщения:</span>
+                <span id="statMessages">{{ room.messages_count }}</span>
+            </div>
+            <div class="stats-item">
+                <span>Ссылки:</span>
+                <span id="statLinks">{{ room.links_count }}</span>
+            </div>
+            <div class="stats-item">
+                <span>Медиа:</span>
+                <span id="statMedia">{{ room.media_count }}</span>
+            </div>
+            <div class="stats-item">
+                <span>Файлы:</span>
+                <span id="statFiles">{{ room.files_count }}</span>
+            </div>
+            <div class="stats-item">
+                <span>Музыка:</span>
+                <span id="statMusic">{{ room.music_count }}</span>
+            </div>
+            <div class="stats-item">
+                <span>Голосовые:</span>
+                <span id="statVoice">{{ room.voice_messages_count }}</span>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <!-- Админ панель (только для администраторов) -->
+    {% if user.is_staff %}
+    <div class="admin-panel">
+        <h2>Панель администратора</h2>
+        <div class="admin-controls">
+            <button class="admin-btn edit" onclick="editRoom({{ room.id }})">Редактировать комнату</button>
+            <button class="admin-btn" onclick="deleteRoom({{ room.id }})">Удалить комнату</button>
+            <a href="{% url 'manage_users' %}" class="admin-btn">Управление пользователями</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="chat-container">
+        <div class="sidebar">
+            <h3>Участники ({{ room.participants.count }})</h3>
+            <div class="participants-list">
+                {% for participant in room.participants.all %}
+                    <div class="participant">
+                        {{ participant.username }}
+                        {% if participant.is_staff %}
+                            <span style="color: #dc3545;">(Admin)</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="chat-main">
+            <div class="chat-messages" id="chatMessages">
+                {% for message in messages %}
+                    <div class="message">
+                        <strong>{{ message.user.username }}:</strong>
+                        {{ message.content }}
+                        <small>{{ message.timestamp|date:"H:i" }}</small>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="message-input">
+                <input type="text" id="messageInput" placeholder="Введите сообщение...">
+                <button onclick="sendMessage({{ room.id }})">Отправить</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function editRoom(roomId) {
+        window.location.href = `/rooms/${roomId}/edit/`;
+    }
+
+    function sendMessage(roomId) {
+        const messageInput = document.getElementById('messageInput');
+        const content = messageInput.value.trim();
+        
+        if (content) {
+            fetch(`/rooms/${roomId}/send_message/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    'content': content
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    messageInput.value = '';
+                    // Обновить сообщения (в реальном приложении через WebSockets)
+                    location.reload();
+                }
+            });
+        }
+    }
+
+    // WebSocket подключение для реального времени
+    // Здесь можно добавить WebSocket логику для обновления сообщений
+</script>
+{% endblock %}
+
     </style>
 </head>
 <body>
