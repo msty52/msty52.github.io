@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Chat App{% endblock %}</title>
+    <style>
+        /* Добавить в существующие стили */
+        /* Мобильная адаптация */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+                margin: 0 auto;
+            }
+            
+            .header {
+                flex-direction: column;
+                padding: 10px;
+            }
+            
+            .nav-menu {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 10px;
+            }
+            
+            .room-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .chat-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: 200px;
+            }
+            
+            .chat-messages {
+                height: 300px;
+            }
+            
+            .message-input {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .message-input input {
+                width: 100%;
+            }
+            
+            .admin-panel {
+                flex-direction: column;
+            }
+            
+            .stats-popup {
+                width: 90%;
+                left: 5%;
+                right: 5%;
+            }
+        }
+
+        /* Стили для кружка статистики */
+        .stats-toggle {
+            position: relative;
+            display: inline-block;
+        }
+
+        .stats-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .stats-circle:hover {
+            background: #0056b3;
+            transform: scale(1.1);
+        }
+
+        .stats-popup {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
+            min-width: 250px;
+        }
+
+        .stats-popup.show {
+            display: block;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .stats-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        /* Админ панель */
+        .admin-panel {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .admin-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .admin-btn {
+            padding: 8px 16px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .admin-btn:hover {
+            background: #c82333;
+        }
+
+        .admin-btn.edit {
+            background: #28a745;
+        }
+
+        .admin-btn.edit:hover {
+            background: #218838;
+        }
+
+        /* Мобильное меню */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+            
+            .nav-menu.mobile-open {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1>{% block header_title %}Chat App{% endblock %}</h1>
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+                <nav class="nav-menu" id="navMenu">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'index' %}">Главная</a>
+                        <a href="{% url 'create_room' %}">Создать комнату</a>
+                        {% if user.is_staff %}
+                            <a href="{% url 'admin_dashboard' %}">Админ панель</a>
+                        {% endif %}
+                        <a href="{% url 'logout' %}">Выйти</a>
+                    {% else %}
+                        <a href="{% url 'login' %}">Войти</a>
+                        <a href="{% url 'register' %}">Регистрация</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <script>
+        // Функционал статистики чата
+        function toggleStats() {
+            const popup = document.getElementById('statsPopup');
+            popup.classList.toggle('show');
+        }
+
+        // Закрытие попапа при клике вне его
+        document.addEventListener('click', function(event) {
+            const popup = document.getElementById('statsPopup');
+            const toggleBtn = document.querySelector('.stats-circle');
+            
+            if (popup && toggleBtn) {
+                if (!popup.contains(event.target) && !toggleBtn.contains(event.target)) {
+                    popup.classList.remove('show');
+                }
+            }
+        });
+
+        // Мобильное меню
+        function toggleMobileMenu() {
+            const menu = document.getElementById('navMenu');
+            menu.classList.toggle('mobile-open');
+        }
+
+        // Функции администратора
+        function deleteRoom(roomId) {
+            if (confirm('Вы уверены, что хотите удалить эту комнату?')) {
+                fetch(`/rooms/${roomId}/delete/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = "{% url 'index' %}";
+                    }
+                });
+            }
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+    
+    {% block extra_scripts %}
+    {% endblock %}
+</body>
+</html>
