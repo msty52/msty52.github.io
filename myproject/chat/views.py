@@ -1,7 +1,7 @@
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 
 def register_view(request):
@@ -14,29 +14,33 @@ def register_view(request):
         password1 = request.POST.get('password1', '')
         password2 = request.POST.get('password2', '')
         
-        # Базовая валидация
-        if not username:
-            messages.error(request, 'Имя пользователя обязательно.')
-            return render(request, 'register.html')
+        # Валидация
+        errors = []
         
-        if not password1 or not password2:
-            messages.error(request, 'Все поля пароля обязательны.')
-            return render(request, 'register.html')
+        if not username:
+            errors.append('Имя пользователя обязательно.')
+        
+        if not password1:
+            errors.append('Пароль обязателен.')
+        
+        if not password2:
+            errors.append('Подтверждение пароля обязательно.')
         
         if password1 != password2:
-            messages.error(request, 'Пароли не совпадают.')
-            return render(request, 'register.html')
+            errors.append('Пароли не совпадают.')
         
         if len(password1) < 8:
-            messages.error(request, 'Пароль должен содержать минимум 8 символов.')
+            errors.append('Пароль должен содержать минимум 8 символов.')
+        
+        if User.objects.filter(username=username).exists():
+            errors.append('Пользователь с таким именем уже существует.')
+        
+        if errors:
+            for error in errors:
+                messages.error(request, error)
             return render(request, 'register.html')
         
         try:
-            # Проверяем, существует ли пользователь
-            if User.objects.filter(username=username).exists():
-                messages.error(request, 'Пользователь с таким именем уже существует.')
-                return render(request, 'register.html')
-            
             # Создаем пользователя
             user = User.objects.create_user(
                 username=username,
@@ -78,3 +82,9 @@ def login_view(request):
             messages.error(request, 'Неверное имя пользователя или пароль.')
     
     return render(request, 'auth.html')
+
+def logout_view(request):
+    from django.contrib.auth import logout
+    logout(request)
+    messages.info(request, 'Вы успешно вышли из системы.')
+    return redirect('home')
