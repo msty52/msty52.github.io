@@ -16,12 +16,12 @@
             background-color: #f5f5f5;
             color: #333;
             line-height: 1.6;
+            padding: 20px;
         }
         
         .container {
             max-width: 500px;
-            margin: 30px auto;
-            padding: 20px;
+            margin: 0 auto;
         }
         
         .auth-container {
@@ -39,46 +39,38 @@
         .auth-header h1 {
             color: #2c3e50;
             margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .auth-header p {
+            color: #7f8c8d;
+            font-size: 16px;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
         .form-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: bold;
+            font-size: 16px;
         }
         
         .form-group input, .form-group select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #e0e0e0;
             border-radius: 4px;
-            font-size: 1rem;
+            font-size: 16px;
         }
         
         .form-group small {
             color: #7f8c8d;
-            font-size: 0.9rem;
-        }
-        
-        .checkbox-group {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .checkbox-group input {
-            width: auto;
-            margin-top: 3px;
-        }
-        
-        .checkbox-group label {
-            font-weight: normal;
-            line-height: 1.4;
+            font-size: 14px;
+            display: block;
+            margin-top: 5px;
         }
         
         .required {
@@ -89,15 +81,16 @@
             display: inline-block;
             background-color: #3498db;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 20px;
             text-decoration: none;
             border-radius: 4px;
             border: none;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 16px;
             transition: background-color 0.3s;
             text-align: center;
             width: 100%;
+            margin-bottom: 15px;
         }
         
         .btn:hover {
@@ -106,7 +99,6 @@
         
         .btn-secondary {
             background-color: #95a5a6;
-            margin-top: 10px;
         }
         
         .btn-secondary:hover {
@@ -130,13 +122,13 @@
         .error-message {
             color: #e74c3c;
             margin-top: 5px;
-            font-size: 0.9rem;
+            font-size: 14px;
         }
         
         .success-message {
             color: #27ae60;
             margin-top: 5px;
-            font-size: 0.9rem;
+            font-size: 14px;
         }
         
         .hidden {
@@ -155,7 +147,7 @@
             <form id="register-form">
                 <div class="form-group">
                     <label for="username">Имя пользователя <span class="required">*</span></label>
-                    <input type="text" id="username" name="username" placeholder="Придумайте имя пользователя" required>
+                    <input type="text" id="username" name="username" placeholder="msty_" required>
                     <small>Required. 150 characters or fewer. Letters, digits and @//+/-/. only.</small>
                     <div id="username-error" class="error-message hidden"></div>
                 </div>
@@ -204,17 +196,6 @@
                     <div id="password-confirm-error" class="error-message hidden"></div>
                 </div>
                 
-                <div class="checkbox-group">
-                    <input type="checkbox" id="terms" name="terms" required>
-                    <label for="terms">Я соглашаюсь с <a href="#">условиями использования</a> и <a href="#">политикой конфиденциальности</a> <span class="required">*</span></label>
-                    <div id="terms-error" class="error-message hidden"></div>
-                </div>
-                
-                <div class="checkbox-group">
-                    <input type="checkbox" id="newsletter" name="newsletter">
-                    <label for="newsletter">Подписаться на рассылку новостей и специальных предложений</label>
-                </div>
-                
                 <div id="success-message" class="success-message hidden"></div>
                 
                 <button type="submit" class="btn">Зарегистрироваться</button>
@@ -239,8 +220,6 @@
             const country = document.getElementById('country').value;
             const password = document.getElementById('password').value;
             const passwordConfirm = document.getElementById('password-confirm').value;
-            const terms = document.getElementById('terms').checked;
-            const newsletter = document.getElementById('newsletter').checked;
             
             const usernameError = document.getElementById('username-error');
             const lastnameError = document.getElementById('lastname-error');
@@ -248,7 +227,6 @@
             const countryError = document.getElementById('country-error');
             const passwordError = document.getElementById('password-error');
             const passwordConfirmError = document.getElementById('password-confirm-error');
-            const termsError = document.getElementById('terms-error');
             const successMessage = document.getElementById('success-message');
             
             // Сбрасываем сообщения об ошибках
@@ -258,7 +236,6 @@
             countryError.classList.add('hidden');
             passwordError.classList.add('hidden');
             passwordConfirmError.classList.add('hidden');
-            termsError.classList.add('hidden');
             successMessage.classList.add('hidden');
             
             let isValid = true;
@@ -310,13 +287,6 @@
                 isValid = false;
             }
             
-            // Проверка согласия с условиями
-            if (!terms) {
-                termsError.textContent = 'Необходимо согласиться с условиями использования';
-                termsError.classList.remove('hidden');
-                isValid = false;
-            }
-            
             // Проверка существующего пользователя
             const users = JSON.parse(localStorage.getItem('users') || '[]');
             const existingUser = users.find(u => u.username === username);
@@ -334,8 +304,7 @@
                     lastname,
                     email,
                     country,
-                    password,
-                    newsletter
+                    password
                 };
                 
                 users.push(newUser);
