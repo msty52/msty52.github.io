@@ -3,253 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация</title>
+    <title>Регистрация - Чат-комнаты</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
             max-width: 500px;
             margin: 50px auto;
             padding: 20px;
-            background-color: #f5f5f5;
         }
         
-        .registration-form {
-            background: white;
+        .auth-container {
+            background-color: white;
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
-        h2 {
+        .auth-header {
             text-align: center;
-            color: #333;
             margin-bottom: 30px;
+        }
+        
+        .auth-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
         }
         
         .form-group {
             margin-bottom: 20px;
         }
         
-        label {
+        .form-group label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
-            color: #555;
         }
         
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        input[type="tel"],
-        select {
+        .form-group input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
             border-radius: 4px;
-            font-size: 16px;
-            box-sizing: border-box;
+            font-size: 1rem;
         }
         
-        input:focus {
-            border-color: #4CAF50;
-            outline: none;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        .form-group small {
+            color: #7f8c8d;
+            font-size: 0.9rem;
         }
         
-        .checkbox-group {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-        }
-        
-        .checkbox-group input {
-            margin-top: 3px;
-        }
-        
-        .checkbox-group label {
-            font-weight: normal;
-            font-size: 14px;
-        }
-        
-        .submit-btn {
-            width: 100%;
-            background-color: #4CAF50;
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
             color: white;
-            padding: 14px;
-            border: none;
+            padding: 10px 20px;
+            text-decoration: none;
             border-radius: 4px;
-            font-size: 16px;
+            border: none;
             cursor: pointer;
+            font-size: 1rem;
             transition: background-color 0.3s;
-        }
-        
-        .submit-btn:hover {
-            background-color: #45a049;
-        }
-        
-        .login-link {
             text-align: center;
-            margin-top: 20px;
+            width: 100%;
         }
         
-        .login-link a {
-            color: #4CAF50;
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+            margin-top: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .auth-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .auth-links a {
+            color: #3498db;
             text-decoration: none;
         }
         
-        .login-link a:hover {
+        .auth-links a:hover {
             text-decoration: underline;
         }
         
-        .error {
-            color: red;
-            font-size: 12px;
+        .error-message {
+            color: #e74c3c;
             margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .success-message {
+            color: #27ae60;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .hidden {
             display: none;
         }
     </style>
 </head>
 <body>
-    <div class="registration-form">
-        <h2>Создать аккаунт</h2>
-        <form id="registrationForm" action="/register" method="POST">
-            <div class="form-group">
-                <label for="firstName">Имя *</label>
-                <input type="text" id="firstName" name="firstName" required>
-                <div class="error" id="firstNameError">Пожалуйста, введите ваше имя</div>
+    <div class="container">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1>Регистрация</h1>
+                <p>Создайте новый аккаунт</p>
             </div>
             
-            <div class="form-group">
-                <label for="lastName">Фамилия *</label>
-                <input type="text" id="lastName" name="lastName" required>
-                <div class="error" id="lastNameError">Пожалуйста, введите вашу фамилию</div>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email *</label>
-                <input type="email" id="email" name="email" required>
-                <div class="error" id="emailError">Пожалуйста, введите корректный email</div>
-            </div>
-            
-            <div class="form-group">
-                <label for="phone">Телефон</label>
-                <input type="tel" id="phone" name="phone" placeholder="+7 (XXX) XXX-XX-XX">
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Пароль *</label>
-                <input type="password" id="password" name="password" required minlength="6">
-                <div class="error" id="passwordError">Пароль должен содержать минимум 6 символов</div>
-            </div>
-            
-            <div class="form-group">
-                <label for="confirmPassword">Подтверждение пароля *</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required>
-                <div class="error" id="confirmPasswordError">Пароли не совпадают</div>
-            </div>
-            
-            <div class="form-group">
-                <label for="country">Страна</label>
-                <select id="country" name="country">
-                    <option value="">Выберите страну</option>
-                    <option value="ru">Россия</option>
-                    <option value="kz">Казахстан</option>
-                    <option value="by">Беларусь</option>
-                    <option value="other">Другая</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <div class="checkbox-group">
-                    <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
-                    <label for="agreeTerms">
-                        Я соглашаюсь с <a href="/terms" target="_blank">условиями использования</a> 
-                        и <a href="/privacy" target="_blank">политикой конфиденциальности</a> *
-                    </label>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="username">Имя пользователя</label>
+                    <input type="text" id="username" name="username" placeholder="Придумайте имя пользователя" required>
+                    <small>Required. 150 characters or fewer. Letters, digits and @//+/-/. only.</small>
+                    <div id="username-error" class="error-message hidden"></div>
                 </div>
-                <div class="error" id="termsError">Необходимо принять условия использования</div>
-            </div>
-            
-            <div class="form-group">
-                <div class="checkbox-group">
-                    <input type="checkbox" id="newsletter" name="newsletter">
-                    <label for="newsletter">Подписаться на рассылку новостей и специальных предложений</label>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Введите ваш email" required>
+                    <div id="email-error" class="error-message hidden"></div>
                 </div>
-            </div>
+                
+                <div class="form-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" name="password" placeholder="Введите пароль" required>
+                    <small>
+                        - Your password can't be too similar to your other personal information.<br>
+                        - Your password must contain at least 8 characters.<br>
+                        - Your password can't be a commonly used password.<br>
+                        - Your password can't be entirely numeric.
+                    </small>
+                    <div id="password-error" class="error-message hidden"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password-confirm">Подтверждение пароля</label>
+                    <input type="password" id="password-confirm" name="password-confirm" placeholder="Введите пароль еще раз" required>
+                    <small>Enter the same password as before, for verification.</small>
+                    <div id="password-confirm-error" class="error-message hidden"></div>
+                </div>
+                
+                <div id="success-message" class="success-message hidden"></div>
+                
+                <button type="submit" class="btn">Зарегистрироваться</button>
+            </form>
             
-            <button type="submit" class="submit-btn">Зарегистрироваться</button>
-        </form>
-        
-        <div class="login-link">
-            Уже есть аккаунт? <a href="/login">Войти</a>
+            <a href="index.html" class="btn btn-secondary">На главную</a>
+            
+            <div class="auth-links">
+                <p>Уже есть аккаунт? <a href="auth.html">Войдите</a></p>
+            </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        document.getElementById('register-form').addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('password-confirm').value;
+            
+            const usernameError = document.getElementById('username-error');
+            const emailError = document.getElementById('email-error');
+            const passwordError = document.getElementById('password-error');
+            const passwordConfirmError = document.getElementById('password-confirm-error');
+            const successMessage = document.getElementById('success-message');
+            
+            // Сбрасываем сообщения об ошибках
+            usernameError.classList.add('hidden');
+            emailError.classList.add('hidden');
+            passwordError.classList.add('hidden');
+            passwordConfirmError.classList.add('hidden');
+            successMessage.classList.add('hidden');
             
             let isValid = true;
             
-            // Проверка имени
-            const firstName = document.getElementById('firstName');
-            if (!firstName.value.trim()) {
-                document.getElementById('firstNameError').style.display = 'block';
+            // Проверка имени пользователя
+            if (username.length > 150) {
+                usernameError.textContent = 'Имя пользователя должно содержать не более 150 символов';
+                usernameError.classList.remove('hidden');
                 isValid = false;
-            } else {
-                document.getElementById('firstNameError').style.display = 'none';
             }
             
-            // Проверка фамилии
-            const lastName = document.getElementById('lastName');
-            if (!lastName.value.trim()) {
-                document.getElementById('lastNameError').style.display = 'block';
+            if (!/^[a-zA-Z0-9@/./+/-/_]+$/.test(username)) {
+                usernameError.textContent = 'Имя пользователя может содержать только буквы, цифры и символы @/./+/-/_';
+                usernameError.classList.remove('hidden');
                 isValid = false;
-            } else {
-                document.getElementById('lastNameError').style.display = 'none';
-            }
-            
-            // Проверка email
-            const email = document.getElementById('email');
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email.value)) {
-                document.getElementById('emailError').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('emailError').style.display = 'none';
             }
             
             // Проверка пароля
-            const password = document.getElementById('password');
-            if (password.value.length < 6) {
-                document.getElementById('passwordError').style.display = 'block';
+            if (password.length < 8) {
+                passwordError.textContent = 'Пароль должен содержать не менее 8 символов';
+                passwordError.classList.remove('hidden');
                 isValid = false;
-            } else {
-                document.getElementById('passwordError').style.display = 'none';
             }
             
-            // Проверка подтверждения пароля
-            const confirmPassword = document.getElementById('confirmPassword');
-            if (password.value !== confirmPassword.value) {
-                document.getElementById('confirmPasswordError').style.display = 'block';
+            if (/^\d+$/.test(password)) {
+                passwordError.textContent = 'Пароль не может состоять только из цифр';
+                passwordError.classList.remove('hidden');
                 isValid = false;
-            } else {
-                document.getElementById('confirmPasswordError').style.display = 'none';
             }
             
-            // Проверка согласия с условиями
-            const agreeTerms = document.getElementById('agreeTerms');
-            if (!agreeTerms.checked) {
-                document.getElementById('termsError').style.display = 'block';
+            // Проверка совпадения паролей
+            if (password !== passwordConfirm) {
+                passwordConfirmError.textContent = 'Пароли не совпадают';
+                passwordConfirmError.classList.remove('hidden');
                 isValid = false;
-            } else {
-                document.getElementById('termsError').style.display = 'none';
+            }
+            
+            // Проверка существующего пользователя
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const existingUser = users.find(u => u.username === username);
+            
+            if (existingUser) {
+                usernameError.textContent = 'Пользователь с таким именем уже существует';
+                usernameError.classList.remove('hidden');
+                isValid = false;
             }
             
             if (isValid) {
-                // Здесь обычно отправка данных на сервер
-                alert('Регистрация успешна!');
-                // this.submit(); // Раскомментировать для реальной отправки формы
+                // Сохраняем нового пользователя
+                const newUser = {
+                    username,
+                    email,
+                    password
+                };
+                
+                users.push(newUser);
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                // Показываем сообщение об успехе
+                successMessage.textContent = 'Регистрация прошла успешно! Теперь вы можете войти в систему.';
+                successMessage.classList.remove('hidden');
+                
+                // Очищаем форму
+                document.getElementById('register-form').reset();
+                
+                // Перенаправляем на страницу входа через 2 секунды
+                setTimeout(() => {
+                    window.location.href = 'auth.html';
+                }, 2000);
             }
         });
     </script>
