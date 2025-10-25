@@ -119,15 +119,6 @@
             border-color: #667eea;
         }
         
-        .error {
-            background: #ffebee;
-            color: #c62828;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #f44336;
-        }
-        
         .success {
             background: #e8f5e8;
             color: #2e7d32;
@@ -135,6 +126,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
             border-left: 4px solid #4caf50;
+            text-align: center;
         }
         
         .form-icon {
@@ -208,18 +200,6 @@
             text-decoration: underline;
         }
 
-        .login-options {
-            text-align: center;
-            margin: 15px 0;
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .login-options span {
-            display: block;
-            margin: 10px 0;
-        }
-
         @media (max-width: 480px) {
             .container {
                 padding: 20px;
@@ -251,12 +231,8 @@
             <p>Войдите по email или имени пользователя</p>
         </div>
         
-        <div id="errorMessage" class="error" style="display: none;">
-            Неправильные данные для входа
-        </div>
-        
         <div id="successMessage" class="success" style="display: none;">
-            Вход выполнен успешно!
+            Вы успешно вошли в систему!
         </div>
         
         <form method="post" id="loginForm">
@@ -273,10 +249,6 @@
                     <input type="password" id="password" name="password" class="form-control" placeholder="Введите ваш пароль" required>
                     <span class="password-toggle-icon">👁️</span>
                 </div>
-            </div>
-            
-            <div class="login-options">
-                <span>Можно использовать email или имя пользователя</span>
             </div>
             
             <div class="remember-forgot">
@@ -319,67 +291,38 @@
             });
         });
 
-        // Определение типа введенных данных (email или имя пользователя)
-        function getLoginType(value) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return emailRegex.test(value) ? 'email' : 'username';
-        }
-
         // Обработка формы входа
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const login = document.getElementById('login').value;
             const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('errorMessage');
             const successMessage = document.getElementById('successMessage');
 
-            // Скрыть предыдущие сообщения
-            errorMessage.style.display = 'none';
-            successMessage.style.display = 'none';
-
-            // Валидация
+            // Простая проверка заполнения полей
             if (!login || !password) {
-                errorMessage.textContent = 'Пожалуйста, заполните все поля';
-                errorMessage.style.display = 'block';
+                alert('Пожалуйста, заполните все поля');
                 return;
             }
 
-            // Определить тип логина
-            const loginType = getLoginType(login);
-            
-            // Имитация успешного входа
+            // Показать сообщение об успешном входе
             successMessage.style.display = 'block';
-            successMessage.textContent = `Вход выполнен успешно! (использован ${loginType === 'email' ? 'email' : 'логин'})`;
             
-            // В реальном приложении здесь был бы запрос к серверу
-            setTimeout(() => {
-                alert(`Добро пожаловать! Вы вошли с помощью ${loginType === 'email' ? 'email' : 'имени пользователя'}`);
-            }, 1000);
+            // В реальном приложении здесь была бы отправка данных на сервер
+            console.log('Данные для входа:', { login, password });
         });
 
         // Восстановление пароля
         document.querySelector('.forgot-password').addEventListener('click', function(e) {
             e.preventDefault();
             const login = document.getElementById('login').value;
-            const loginType = getLoginType(login);
             
             if (login) {
-                if (loginType === 'email') {
-                    alert(`Инструкции по восстановлению пароля отправлены на ${login}`);
-                } else {
-                    alert(`Для восстановления пароля введите ваш email в поле выше`);
-                    document.getElementById('login').focus();
-                }
+                alert(`Инструкции по восстановлению пароля отправлены на указанные данные`);
             } else {
                 alert('Пожалуйста, введите ваш email или имя пользователя');
                 document.getElementById('login').focus();
             }
-        });
-
-        // Подсказка при фокусе
-        document.getElementById('login').addEventListener('focus', function() {
-            this.setAttribute('title', 'Можно ввести email или имя пользователя');
         });
     </script>
 </body>
