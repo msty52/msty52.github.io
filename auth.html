@@ -119,6 +119,17 @@
             border-color: #667eea;
         }
         
+        .btn-chat {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            margin-top: 15px;
+        }
+        
+        .btn-chat:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(76, 175, 80, 0.4);
+        }
+        
         .success {
             background: #e8f5e8;
             color: #2e7d32;
@@ -200,6 +211,82 @@
             text-decoration: underline;
         }
 
+        /* Стили для чата */
+        .chat-container {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            height: 600px;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e1e5e9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 70%;
+        }
+
+        .message.user {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .message.bot {
+            background: #e1e5e9;
+            color: #333;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .chat-input button {
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .back-to-login {
+            text-align: center;
+            margin-top: 15px;
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 20px;
@@ -218,11 +305,21 @@
                 gap: 10px;
                 align-items: flex-start;
             }
+
+            .chat-container {
+                padding: 20px;
+                height: 500px;
+            }
+
+            .message {
+                max-width: 85%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Форма входа -->
+    <div class="container" id="loginContainer">
         <div class="header">
             <div class="form-icon">
                 <span>🔐</span>
@@ -263,19 +360,57 @@
                 🔑 Войти
             </button>
             
-            <a href="#" class="btn btn-secondary">
+            <a href="#" class="btn btn-secondary" id="homeButton">
                 ← На главную
             </a>
+
+            <button type="button" class="btn btn-chat" id="chatButton" style="display: none;">
+                💬 Перейти в чат
+            </button>
         </form>
         
         <div class="auth-switch">
-            Нет аккаунта? <a href="#">Зарегистрируйтесь</a>
+            Нет аккаунта? <a href="#" id="registerLink">Зарегистрируйтесь</a>
+        </div>
+    </div>
+
+    <!-- Чат -->
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <h1>💬 Общий чат</h1>
+            <p>Добро пожаловать в чат!</p>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <strong>Система:</strong> Добро пожаловать в чат! Начните общение.
+            </div>
+        </div>
+        
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Введите ваше сообщение...">
+            <button id="sendMessage">Отправить</button>
+        </div>
+        
+        <div class="back-to-login">
+            <button class="btn btn-secondary" id="backToLogin">
+                ← Выйти из чата
+            </button>
         </div>
     </div>
 
     <script>
-        // Автофокус на поле логина
-        document.getElementById('login').focus();
+        // Элементы DOM
+        const loginContainer = document.getElementById('loginContainer');
+        const chatContainer = document.getElementById('chatContainer');
+        const chatButton = document.getElementById('chatButton');
+        const successMessage = document.getElementById('successMessage');
+        const homeButton = document.getElementById('homeButton');
+        const registerLink = document.getElementById('registerLink');
+        const backToLogin = document.getElementById('backToLogin');
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendMessage = document.getElementById('sendMessage');
 
         // Переключение видимости пароля
         document.querySelectorAll('.password-toggle-icon').forEach(icon => {
@@ -297,7 +432,6 @@
             
             const login = document.getElementById('login').value;
             const password = document.getElementById('password').value;
-            const successMessage = document.getElementById('successMessage');
 
             // Простая проверка заполнения полей
             if (!login || !password) {
@@ -307,10 +441,60 @@
 
             // Показать сообщение об успешном входе
             successMessage.style.display = 'block';
+            chatButton.style.display = 'block';
             
-            // В реальном приложении здесь была бы отправка данных на сервер
-            console.log('Данные для входа:', { login, password });
+            // Сохраняем информацию о пользователе
+            localStorage.setItem('userLoggedIn', 'true');
+            localStorage.setItem('username', login);
+            
+            console.log('Пользователь вошел:', login);
         });
+
+        // Переход в чат
+        chatButton.addEventListener('click', function() {
+            loginContainer.style.display = 'none';
+            chatContainer.style.display = 'flex';
+            
+            // Добавляем приветственное сообщение
+            const welcomeMessage = document.createElement('div');
+            welcomeMessage.className = 'message bot';
+            welcomeMessage.innerHTML = `<strong>Система:</strong> Добро пожаловать, ${localStorage.getItem('username')}!`;
+            chatMessages.appendChild(welcomeMessage);
+        });
+
+        // Отправка сообщения в чат
+        sendMessage.addEventListener('click', sendChatMessage);
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+
+        function sendChatMessage() {
+            const message = messageInput.value.trim();
+            if (message) {
+                // Сообщение пользователя
+                const userMessage = document.createElement('div');
+                userMessage.className = 'message user';
+                userMessage.innerHTML = `<strong>Вы:</strong> ${message}`;
+                chatMessages.appendChild(userMessage);
+                
+                // Очищаем поле ввода
+                messageInput.value = '';
+                
+                // Автопрокрутка к новому сообщению
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Имитация ответа бота (через 1 секунду)
+                setTimeout(() => {
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'message bot';
+                    botMessage.innerHTML = `<strong>Бот:</strong> Получил ваше сообщение: "${message}"`;
+                    chatMessages.appendChild(botMessage);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+            }
+        }
 
         // Восстановление пароля
         document.querySelector('.forgot-password').addEventListener('click', function(e) {
@@ -322,6 +506,36 @@
             } else {
                 alert('Пожалуйста, введите ваш email или имя пользователя');
                 document.getElementById('login').focus();
+            }
+        });
+
+        // Кнопка "На главную"
+        homeButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Переход на главную страницу');
+        });
+
+        // Ссылка на регистрацию
+        registerLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Переход к регистрации');
+        });
+
+        // Возврат к форме входа из чата
+        backToLogin.addEventListener('click', function() {
+            chatContainer.style.display = 'none';
+            loginContainer.style.display = 'block';
+        });
+
+        // Автофокус на поле логина при загрузке
+        document.getElementById('login').focus();
+
+        // Проверка, был ли пользователь уже авторизован
+        window.addEventListener('load', function() {
+            if (localStorage.getItem('userLoggedIn') === 'true') {
+                successMessage.style.display = 'block';
+                chatButton.style.display = 'block';
+                document.getElementById('login').value = localStorage.getItem('username') || '';
             }
         });
     </script>
