@@ -1,49 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>{% if auth_type == 'register' %}Регистрация{% else %}Вход{% endif %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация и Вход</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
-            padding: 0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
+            line-height: 1.6;
         }
         
         .container {
             background: white;
             border-radius: 15px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            padding: 40px;
+            padding: 30px;
             width: 100%;
             max-width: 450px;
-            margin: 20px;
+            margin: 0 auto;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         
         .header h1 {
             color: #333;
-            margin: 0 0 10px 0;
-            font-size: 2.2em;
+            margin: 0 0 8px 0;
+            font-size: 2em;
             font-weight: 300;
         }
         
         .header p {
             color: #666;
             margin: 0;
-            font-size: 1.1em;
+            font-size: 1em;
         }
         
         .form-group {
             margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
         }
         
         .form-control {
@@ -54,6 +69,7 @@
             font-size: 16px;
             transition: all 0.3s ease;
             box-sizing: border-box;
+            font-family: inherit;
         }
         
         .form-control:focus {
@@ -78,6 +94,7 @@
             text-align: center;
             transition: all 0.3s ease;
             width: 100%;
+            font-family: inherit;
         }
         
         .btn-primary {
@@ -164,69 +181,134 @@
             margin-bottom: 5px;
             border-left: 3px solid #f44336;
         }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .password-toggle-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.7em;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <div class="form-icon">
-                <span>{% if auth_type == 'register' %}👤{% else %}🔐{% endif %}</span>
+                <span>👤</span>
             </div>
-            <h1>{% if auth_type == 'register' %}Регистрация{% else %}Вход{% endif %}</h1>
-            <p>{% if auth_type == 'register' %}Создайте новый аккаунт{% else %}Войдите в свой аккаунт{% endif %}</p>
+            <h1>Регистрация</h1>
+            <p>Создайте новый аккаунт</p>
         </div>
         
-        {% if messages %}
-            {% for message in messages %}
-                <div class="{% if message.tags == 'error' %}error{% else %}success{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
+        <div class="success">
+            Добро пожаловать! Заполните форму ниже.
+        </div>
         
         <form method="post">
-            {% csrf_token %}
+            <input type="hidden" name="csrf_token" value="example_csrf_token">
             
-            {% for field in form %}
-                <div class="form-group">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}
-                        <ul class="errorlist">
-                            {% for error in field.errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    {% if field.help_text %}
-                        <div style="font-size: 0.85em; color: #666; margin-top: 5px;">
-                            {{ field.help_text }}
-                        </div>
-                    {% endif %}
+            <div class="form-group">
+                <label for="username">Имя пользователя</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Введите имя пользователя" required>
+                <div style="font-size: 0.85em; color: #666; margin-top: 5px;">
+                    Только буквы, цифры и символы @/./+/-/_
                 </div>
-            {% endfor %}
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Введите ваш email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <div class="password-toggle">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Введите пароль" required>
+                    <span class="password-toggle-icon">👁️</span>
+                </div>
+                <div style="font-size: 0.85em; color: #666; margin-top: 5px;">
+                    Пароль должен содержать минимум 8 символов
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">Подтверждение пароля</label>
+                <div class="password-toggle">
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Повторите пароль" required>
+                    <span class="password-toggle-icon">👁️</span>
+                </div>
+            </div>
             
             <button type="submit" class="btn btn-primary">
-                {% if auth_type == 'register' %}🚀 Зарегистрироваться{% else %}🔑 Войти{% endif %}
+                🚀 Зарегистрироваться
             </button>
             
-            <a href="{% url 'home' %}" class="btn btn-secondary">
+            <a href="#" class="btn btn-secondary">
                 ← На главную
             </a>
         </form>
         
         <div class="auth-switch">
-            {% if auth_type == 'register' %}
-                Уже есть аккаунт? <a href="{% url 'login' %}">Войдите</a>
-            {% else %}
-                Нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйтесь</a>
-            {% endif %}
+            Уже есть аккаунт? <a href="#">Войдите</a>
         </div>
     </div>
 
     <script>
         // Автофокус на первом поле
         document.querySelector('.form-control').focus();
+
+        // Переключение видимости пароля
+        document.querySelectorAll('.password-toggle-icon').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.textContent = '🔒';
+                } else {
+                    input.type = 'password';
+                    this.textContent = '👁️';
+                }
+            });
+        });
+
+        // Валидация пароля
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirm_password');
+            
+            if (password.value !== confirmPassword.value) {
+                e.preventDefault();
+                alert('Пароли не совпадают!');
+                confirmPassword.focus();
+            }
+            
+            if (password.value.length < 8) {
+                e.preventDefault();
+                alert('Пароль должен содержать минимум 8 символов!');
+                password.focus();
+            }
+        });
     </script>
 </body>
 </html>
