@@ -9,323 +9,416 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
         }
-
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
         .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 20px;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .btn-full {
+            width: 100%;
+        }
+        
+        .hero {
+            background-color: #34495e;
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
             max-width: 800px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
         }
-
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        
+        .content {
+            background-color: white;
             padding: 30px;
-            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }
-
-        .header h1 {
-            font-size: 2.5em;
-            font-weight: 300;
-            margin-bottom: 10px;
+        
+        .content h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
         }
-
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .user-info {
-            background: rgba(255, 255, 255, 0.1);
-            margin: 20px -30px -30px -30px;
-            padding: 20px 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .user-info strong {
-            display: block;
-            font-size: 1.2em;
-            margin-bottom: 5px;
-        }
-
-        .user-info .email {
-            opacity: 0.8;
-            font-size: 0.9em;
-        }
-
-        .welcome-section {
-            padding: 25px 30px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e1e5e9;
-            text-align: center;
-            font-size: 1.1em;
-            color: #666;
-        }
-
-        .chat-rooms {
-            padding: 30px;
-        }
-
-        .room-card {
-            background: white;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
+        
+        .chat-room {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
-            transition: all 0.3s ease;
-            cursor: pointer;
         }
-
-        .room-card:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        
+        .chat-room h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
         }
-
-        .room-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+        
+        .chat-room p {
             margin-bottom: 15px;
         }
-
-        .room-title {
-            font-size: 1.3em;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .room-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.9em;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c82333;
-            transform: translateY(-1px);
-        }
-
-        .room-description {
-            color: #666;
+        
+        .chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            padding: 10px;
             margin-bottom: 15px;
-            line-height: 1.5;
+            border-radius: 4px;
         }
-
-        .room-meta {
+        
+        .message {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .message-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            font-size: 0.9em;
-            color: #888;
-            padding-top: 15px;
-            border-top: 1px solid #e1e5e9;
-        }
-
-        .room-author {
-            font-weight: 500;
-        }
-
-        .room-date {
-            opacity: 0.8;
-        }
-
-        .create-room {
-            background: #f8f9fa;
-            border: 2px dashed #667eea;
-            border-radius: 10px;
-            padding: 25px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .create-room:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .create-room-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .create-room-icon {
-            font-size: 2em;
             margin-bottom: 5px;
         }
-
-        .create-room-text {
-            font-size: 1.1em;
-            font-weight: 500;
+        
+        .message-user {
+            font-weight: bold;
+            color: #3498db;
         }
-
-        @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-            }
-            
-            .header {
-                padding: 20px;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .chat-rooms {
-                padding: 20px;
-            }
-            
-            .room-header {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .room-actions {
-                width: 100%;
-                justify-content: flex-end;
-            }
+        
+        .message-time {
+            color: #7f8c8d;
+            font-size: 0.9rem;
         }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-            
-            .room-actions {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
+        
+        .message-content {
+            color: #333;
+        }
+        
+        .message-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .message-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-group small {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .auth-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .auth-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .auth-links a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .success-message {
+            color: #27ae60;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+        
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Шапка -->
-        <div class="header">
+    <header>
+        <div class="container header-content">
+            <div class="logo">Чат-комнаты</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="#" id="chat-link" class="hidden">Чат</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons" id="auth-buttons">
+                <a href="register.html" class="btn">Регистрация</a>
+                <a href="auth.html" class="btn btn-secondary">Вход</a>
+            </div>
+            <div class="user-info hidden" id="user-info">
+                <div class="user-avatar" id="user-avatar">U</div>
+                <span id="username-display">Пользователь</span>
+                <button class="btn btn-secondary" id="logout-btn">Выйти</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="container">
             <h1>Чат-комнаты</h1>
             <p>Общайтесь в реальном времени с друзьями и коллегами</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="content">
+            <h2>Добро пожаловать!</h2>
+            <p>Присоединяйтесь к нашему сообществу</p>
             
-            <div class="user-info">
-                <strong>Привет, insty_1</strong>
-                <span class="email"></span>
+            <div id="auth-required" class="hidden">
+                <h3>Войти в систему</h3>
+                <p>Для создания комнат и отправки сообщений необходимо авторизоваться</p>
+                <div class="auth-buttons">
+                    <a href="register.html" class="btn">Регистрация</a>
+                    <a href="auth.html" class="btn btn-secondary">Вход</a>
+                </div>
             </div>
-        </div>
-
-        <!-- Приветствие -->
-        <div class="welcome-section">
-            С возвращением, 
-        </div>
-
-        <!-- Список чат-комнат -->
-        <div class="chat-rooms">
-            <!-- Чат-комната 1 -->
-            <div class="room-card">
-                <div class="room-header">
-                    <div class="room-title">Чат</div>
-                    <div class="room-actions">
-                        <button class="btn btn-primary">Войти в чат</button>
-                        <button class="btn btn-danger">Удалить</button>
+            
+            <div id="chat-section" class="hidden">
+                <div class="chat-room">
+                    <h3>Чат</h3>
+                    <p>Комната для общения и обмена мнениями</p>
+                    
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message">
+                            <div class="message-header">
+                                <span class="message-user">Администратор</span>
+                                <span class="message-time">11.10.2025 23:37</span>
+                            </div>
+                            <div class="message-content">
+                                Добро пожаловать в наш чат! Начните общение с другими пользователями.
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="room-description">
-                    Комната для общения и обмена мнениями
-                </div>
-                <div class="room-meta">
-                    <span class="room-author"></span>
-                    <span class="room-date">17.10.2025 23:37</span>
-                </div>
-            </div>
-
-            <!-- Кнопка создания новой комнаты -->
-            <div class="create-room">
-                <div class="create-room-content">
-                    <div class="create-room-icon">+</div>
-                    <div class="create-room-text">Создать новую комнату</div>
+                    
+                    <div class="message-input">
+                        <input type="text" id="message-input" placeholder="Введите ваше сообщение...">
+                        <button class="btn" id="send-message">Отправить</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Чат-комнаты. Все права защищены.</p>
+        </div>
+    </footer>
+
     <script>
-        // Обработка входа в чат
-        document.querySelector('.btn-primary').addEventListener('click', function() {
-            alert('Вход в чат...');
-            // Здесь будет переход в чат
-        });
-
-        // Обработка удаления комнаты
-        document.querySelector('.btn-danger').addEventListener('click', function() {
-            if (confirm('Вы уверены, что хотите удалить эту чат-комнату?')) {
-                alert('Чат-комната удалена');
-                // Здесь будет удаление комнаты
+        // Проверка авторизации пользователя
+        function checkAuth() {
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                const userData = JSON.parse(user);
+                document.getElementById('auth-buttons').classList.add('hidden');
+                document.getElementById('user-info').classList.remove('hidden');
+                document.getElementById('username-display').textContent = userData.username;
+                document.getElementById('user-avatar').textContent = userData.username.charAt(0).toUpperCase();
+                document.getElementById('auth-required').classList.add('hidden');
+                document.getElementById('chat-section').classList.remove('hidden');
+                document.getElementById('chat-link').classList.remove('hidden');
+            } else {
+                document.getElementById('auth-buttons').classList.remove('hidden');
+                document.getElementById('user-info').classList.add('hidden');
+                document.getElementById('auth-required').classList.remove('hidden');
+                document.getElementById('chat-section').classList.add('hidden');
+                document.getElementById('chat-link').classList.add('hidden');
             }
+        }
+
+        // Выход из системы
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('currentUser');
+            checkAuth();
         });
 
-        // Обработка создания новой комнаты
-        document.querySelector('.create-room').addEventListener('click', function() {
-            const roomName = prompt('Введите название новой чат-комнаты:');
-            if (roomName) {
-                const roomDescription = prompt('Введите описание комнаты:') || 'Новая комната для общения';
+        // Отправка сообщения
+        document.getElementById('send-message').addEventListener('click', function() {
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value.trim();
+            
+            if (message) {
+                const user = JSON.parse(localStorage.getItem('currentUser'));
+                const messagesContainer = document.getElementById('chat-messages');
                 
-                alert(`Создана новая комната: "${roomName}"`);
-                // Здесь будет создание новой комнаты
+                const now = new Date();
+                const dateStr = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth()+1).toString().padStart(2, '0')}.${now.getFullYear()}`;
+                const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message';
+                messageElement.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-user">${user.username}</span>
+                        <span class="message-time">${dateStr} ${timeStr}</span>
+                    </div>
+                    <div class="message-content">${message}</div>
+                `;
+                
+                messagesContainer.appendChild(messageElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                messageInput.value = '';
             }
         });
 
-        // Клик по карточке комнаты (кроме кнопок)
-        document.querySelector('.room-card').addEventListener('click', function(e) {
-            if (!e.target.classList.contains('btn')) {
-                alert('Вход в чат...');
-                // Здесь будет переход в чат
+        // Отправка сообщения по нажатию Enter
+        document.getElementById('message-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('send-message').click();
             }
         });
+
+        // Проверка авторизации при загрузке страницы
+        document.addEventListener('DOMContentLoaded', checkAuth);
     </script>
 </body>
 </html>
