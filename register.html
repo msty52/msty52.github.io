@@ -135,7 +135,6 @@
                 <div class="form-group">
                     <label for="username">Имя пользователя</label>
                     <input type="text" id="username" name="username" placeholder="Придумайте имя пользователя" required>
-                    <small>Required. 150 characters or fewer. Letters, digits and @//+/-/. only.</small>
                     <div id="username-error" class="error-message hidden"></div>
                 </div>
                 
@@ -148,12 +147,6 @@
                 <div class="form-group">
                     <label for="password">Пароль</label>
                     <input type="password" id="password" name="password" placeholder="Введите пароль" required>
-                    <small>
-                        - Your password can't be too similar to your other personal information.<br>
-                        - Your password must contain at least 8 characters.<br>
-                        - Your password can't be a commonly used password.<br>
-                        - Your password can't be entirely numeric.
-                    </small>
                     <div id="password-error" class="error-message hidden"></div>
                 </div>
                 
@@ -265,7 +258,7 @@
                 // Перенаправляем на страницу входа через 2 секунды
                 setTimeout(() => {
                     window.location.href = 'auth.html';
-                }, 2000);
+                }, 1000);
             }
         });
     </script>
