@@ -234,7 +234,7 @@
                 <p>Присоединяйтесь к нашему сообществу</p>
             </div>
             
-            <div class="chat-section hidden" id="chat-section">
+            <div class="chat-section">
                 <h3>Присоединяйтесь к общению</h3>
                 <p>Создавайте комнаты и общайтесь с другими пользователями в реальном времени</p>
                 <div class="chat-actions">
@@ -243,7 +243,7 @@
                 </div>
             </div>
             
-            <div class="auth-required" id="auth-required">
+            <div class="auth-required">
                 <h3>Войти в систему</h3>
                 <p>Для создания комнат и отправки сообщений необходимо авторизоваться</p>
                 <div class="chat-actions">
@@ -266,10 +266,10 @@
             const user = localStorage.getItem('currentUser');
             if (user) {
                 document.getElementById('auth-required').classList.add('hidden');
-                document.getElementById('chat-section').classList.remove('hidden');
+                document.querySelector('.chat-section').classList.remove('hidden');
             } else {
                 document.getElementById('auth-required').classList.remove('hidden');
-                document.getElementById('chat-section').classList.add('hidden');
+                document.querySelector('.chat-section').classList.add('hidden');
             }
         }
 
