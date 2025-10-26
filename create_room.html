@@ -160,6 +160,15 @@
             border: 1px solid #c3e6cb;
         }
         
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+        
         .hidden {
             display: none;
         }
@@ -189,6 +198,10 @@
             
             <div class="success-message hidden" id="success-message">
                 Комната успешно создана! Перенаправление...
+            </div>
+            
+            <div class="error-message hidden" id="error-message">
+                Ошибка при создании комнаты
             </div>
             
             <form id="create-room-form">
@@ -225,8 +238,10 @@
     </footer>
 
     <script>
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let supabaseClient;
+        let currentUser = null;
 
+        // Проверка авторизации
         async function checkAuth() {
             const user = localStorage.getItem('currentUser');
             if (!user) {
@@ -236,52 +251,86 @@
             return JSON.parse(user);
         }
 
+        // Инициализация
+        window.addEventListener('load', async function() {
+            console.log('Page loaded, initializing create room...');
+            
+            // Проверяем библиотеки
+            if (typeof window.supabase === 'undefined') {
+                console.error('Supabase library not loaded!');
+                document.getElementById('error-message').textContent = 'Библиотека Supabase не загружена';
+                document.getElementById('error-message').classList.remove('hidden');
+                return;
+            }
+            
+            if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+                console.error('Config not loaded!');
+                document.getElementById('error-message').textContent = 'Конфигурация не загружена. Проверьте config.js';
+                document.getElementById('error-message').classList.remove('hidden');
+                return;
+            }
+            
+            // Инициализируем Supabase
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase инициализирован');
+            
+            // Проверяем авторизацию
+            currentUser = await checkAuth();
+            if (currentUser) {
+                document.getElementById('username-display').textContent = currentUser.username;
+            }
+        });
+
         document.getElementById('create-room-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const roomName = document.getElementById('room-name').value;
             const roomDescription = document.getElementById('room-description').value;
             const roomPrivacy = document.getElementById('room-privacy').value;
-            const user = JSON.parse(localStorage.getItem('currentUser'));
             
+            // Скрываем сообщения
+            document.getElementById('success-message').classList.add('hidden');
+            document.getElementById('error-message').classList.add('hidden');
+            
+            console.log('Создание комнаты:', { roomName, roomDescription, roomPrivacy });
+
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('rooms')
                     .insert([
                         {
                             name: roomName,
                             description: roomDescription,
                             privacy: roomPrivacy,
-                            creator_id: user.id
+                            creator_id: currentUser.id
                         }
                     ])
                     .select()
                     .single();
 
                 if (error) {
-                    alert('Ошибка создания комнаты: ' + error.message);
+                    console.error('Ошибка создания комнаты:', error);
+                    document.getElementById('error-message').textContent = 'Ошибка создания комнаты: ' + error.message;
+                    document.getElementById('error-message').classList.remove('hidden');
                 } else {
+                    console.log('Комната создана:', data);
                     document.getElementById('success-message').classList.remove('hidden');
+                    document.getElementById('create-room-form').reset();
                     
                     setTimeout(() => {
                         window.location.href = `room_detail.html?room=${data.id}`;
                     }, 1500);
                 }
             } catch (error) {
-                alert('Ошибка: ' + error.message);
+                console.error('Ошибка:', error);
+                document.getElementById('error-message').textContent = 'Ошибка: ' + error.message;
+                document.getElementById('error-message').classList.remove('hidden');
             }
         });
 
         document.getElementById('logout-btn').addEventListener('click', function() {
             localStorage.removeItem('currentUser');
             window.location.href = 'index.html';
-        });
-
-        document.addEventListener('DOMContentLoaded', async function() {
-            const user = await checkAuth();
-            if (user) {
-                document.getElementById('username-display').textContent = user.username;
-            }
         });
     </script>
 </body>
