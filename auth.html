@@ -106,6 +106,10 @@
             margin-top: 5px;
             font-size: 0.9rem;
         }
+        
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -141,6 +145,14 @@
     </div>
 
     <script>
+        // Проверяем, не авторизован ли пользователь уже
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                window.location.href = 'index.html';
+            }
+        });
+
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
