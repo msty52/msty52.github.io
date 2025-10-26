@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат-комнаты</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <style>
-        /* Стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -247,9 +249,14 @@
                 <h2>Добро пожаловать!</h2>
                 <p>Присоединяйтесь к нашему сообществу</p>
             </div>
-
+            
             <div class="chat-section hidden" id="chat-section">
-                </div
+                <h3>Присоединяйтесь к общению</h3>
+                <p>Создавайте комнаты и общайтесь с другими пользователями в реальном времени</p>
+                <div class="chat-actions">
+                    <a href="home.html" class="btn">Перейти в чат</a>
+                    <a href="create_room.html" class="btn btn-secondary">Создать комнату</a>
+                </div>
             </div>
             
             <div class="auth-required" id="auth-required">
@@ -270,8 +277,19 @@
     </footer>
 
     <script>
-        function updateAuthUI() {
+        // Инициализация Supabase
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function checkAuth() {
             const user = localStorage.getItem('currentUser');
+            if (user) {
+                return JSON.parse(user);
+            }
+            return null;
+        }
+
+        async function updateAuthUI() {
+            const user = await checkAuth();
             const authButtons = document.getElementById('auth-buttons');
             const userInfo = document.getElementById('user-info');
             const authRequired = document.getElementById('auth-required');
@@ -281,30 +299,23 @@
             const registerLink = document.getElementById('register-link');
 
             if (user) {
-                const userData = JSON.parse(user);
-                // Показываем информацию о пользователе
                 authButtons.classList.add('hidden');
                 userInfo.classList.remove('hidden');
-                document.getElementById('username-display').textContent = userData.username;
+                document.getElementById('username-display').textContent = user.username;
                 
-                // Показываем секцию чата
                 authRequired.classList.add('hidden');
                 chatSection.classList.remove('hidden');
                 
-                // Показываем ссылки на чат
                 chatLink.classList.remove('hidden');
                 createRoomLinks.forEach(link => link.classList.remove('hidden'));
                 registerLink.classList.add('hidden');
             } else {
-                // Показываем кнопки авторизации
                 authButtons.classList.remove('hidden');
                 userInfo.classList.add('hidden');
                 
-                // Показываем требование авторизации
                 authRequired.classList.remove('hidden');
                 chatSection.classList.add('hidden');
                 
-                // Скрываем ссылки на чат
                 chatLink.classList.add('hidden');
                 createRoomLinks.forEach(link => link.classList.add('hidden'));
                 registerLink.classList.remove('hidden');
@@ -316,11 +327,7 @@
             updateAuthUI();
         });
 
-        // Проверяем авторизацию при загрузке страницы
         document.addEventListener('DOMContentLoaded', updateAuthUI);
-
-        // Также обновляем при возвращении на страницу (например, после входа)
-        window.addEventListener('pageshow', updateAuthUI);
     </script>
 </body>
 </html>
