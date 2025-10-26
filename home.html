@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Чат-комнаты - Главная</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <style>
         * {
             margin: 0;
@@ -226,7 +228,9 @@
     </footer>
 
     <script>
-        function checkAuth() {
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function checkAuth() {
             const user = localStorage.getItem('currentUser');
             if (!user) {
                 window.location.href = 'auth.html';
@@ -235,36 +239,77 @@
             return JSON.parse(user);
         }
 
-        function loadRooms() {
-            const rooms = JSON.parse(localStorage.getItem('chatRooms') || '[]');
-            const roomsGrid = document.getElementById('rooms-grid');
-            const noRooms = document.getElementById('no-rooms');
-            
-            if (rooms.length === 0) {
-                roomsGrid.classList.add('hidden');
-                noRooms.classList.remove('hidden');
-                return;
+        async function loadRooms() {
+            try {
+                const { data: rooms, error } = await supabase
+                    .from('rooms')
+                    .select(`
+                        *,
+                        users:creator_id(username)
+                    `)
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('Ошибка загрузки комнат:', error);
+                    return;
+                }
+
+                const roomsGrid = document.getElementById('rooms-grid');
+                const noRooms = document.getElementById('no-rooms');
+                
+                if (rooms.length === 0) {
+                    roomsGrid.classList.add('hidden');
+                    noRooms.classList.remove('hidden');
+                    return;
+                }
+
+                roomsGrid.innerHTML = '';
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+                rooms.forEach(room => {
+                    const roomCard = document.createElement('div');
+                    roomCard.className = 'room-card';
+                    roomCard.innerHTML = `
+                        <h3>${room.name}</h3>
+                        <p>${room.description || 'Нет описания'}</p>
+                        <div class="room-meta">
+                            <span>Создатель: ${room.users.username}</span>
+                            <span>${new Date(room.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div class="room-actions">
+                            <a href="room_detail.html?room=${room.id}" class="btn">Войти в чат</a>
+                            ${room.creator_id === currentUser.id ? 
+                              `<button class="btn btn-danger" onclick="deleteRoom('${room.id}')">Удалить</button>` : ''}
+                        </div>
+                    `;
+                    roomsGrid.appendChild(roomCard);
+                });
+
+                roomsGrid.classList.remove('hidden');
+                noRooms.classList.add('hidden');
+
+            } catch (error) {
+                console.error('Ошибка:', error);
             }
-            
-            roomsGrid.innerHTML = '';
-            rooms.forEach(room => {
-                const roomCard = document.createElement('div');
-                roomCard.className = 'room-card';
-                roomCard.innerHTML = `
-                    <h3>${room.name}</h3>
-                    <p>${room.description}</p>
-                    <div class="room-meta">
-                        <span>Создатель: ${room.creator}</span>
-                        <span>Участников: ${room.participants || 1}</span>
-                    </div>
-                    <div class="room-actions">
-                        <a href="room_detail.html?room=${room.id}" class="btn">Войти</a>
-                        ${room.creator === JSON.parse(localStorage.getItem('currentUser')).username ? 
-                          `<a href="delete_room.html?room=${room.id}" class="btn btn-danger">Удалить</a>` : ''}
-                    </div>
-                `;
-                roomsGrid.appendChild(roomCard);
-            });
+        }
+
+        async function deleteRoom(roomId) {
+            if (!confirm('Вы уверены, что хотите удалить эту комнату?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('rooms')
+                    .delete()
+                    .eq('id', roomId);
+
+                if (error) {
+                    alert('Ошибка при удалении комнаты: ' + error.message);
+                } else {
+                    loadRooms(); // Перезагружаем список комнат
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
         }
 
         document.getElementById('logout-btn').addEventListener('click', function() {
@@ -272,8 +317,8 @@
             window.location.href = 'index.html';
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const user = checkAuth();
+        document.addEventListener('DOMContentLoaded', async function() {
+            const user = await checkAuth();
             if (user) {
                 document.getElementById('username-display').textContent = user.username;
                 loadRooms();
