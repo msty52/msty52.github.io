@@ -186,111 +186,112 @@
     </div>
 
     <script>
-        // Инициализация Supabase после загрузки страницы
-        let supabase;
+    // Инициализация Supabase после загрузки страницы
+    let supabaseClient;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Проверяем что конфиг загружен
+        if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+            console.error('Config не загружен! Проверьте config.js');
+            document.getElementById('username-error').textContent = 'Ошибка конфигурации. Проверьте config.js';
+            document.getElementById('username-error').classList.remove('hidden');
+            return;
+        }
         
-        document.addEventListener('DOMContentLoaded', function() {
-            // Проверяем что конфиг загружен
-            if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-                console.error('Config не загружен! Проверьте config.js');
-                document.getElementById('username-error').textContent = 'Ошибка конфигурации. Проверьте config.js';
-                document.getElementById('username-error').classList.remove('hidden');
-                return;
-            }
-            
-            supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('Supabase инициализирован');
+        console.log('Инициализация Supabase...', SUPABASE_URL);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase инициализирован');
+    });
+
+    document.getElementById('register-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        console.log('Форма отправляется...');
+        
+        // Ждем инициализации supabase
+        if (!supabaseClient) {
+            console.error('Supabase не инициализирован');
+            document.getElementById('username-error').textContent = 'Supabase не инициализирован';
+            document.getElementById('username-error').classList.remove('hidden');
+            return;
+        }
+        
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const passwordConfirm = document.getElementById('password-confirm').value;
+        
+        // Сброс ошибок
+        document.querySelectorAll('.error-message').forEach(el => {
+            el.classList.add('hidden');
         });
 
-        document.getElementById('register-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            console.log('Форма отправляется...');
-            
-            // Ждем инициализации supabase
-            if (!supabase) {
-                console.error('Supabase не инициализирован');
-                return;
-            }
-            
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const passwordConfirm = document.getElementById('password-confirm').value;
-            
-            // Сброс ошибок
-            document.querySelectorAll('.error-message').forEach(el => {
-                el.classList.add('hidden');
-            });
+        // Валидация
+        let isValid = true;
 
-            // Валидация
-            let isValid = true;
+        if (username.length > 150) {
+            document.getElementById('username-error').textContent = 'Имя пользователя должно содержать не более 150 символов';
+            document.getElementById('username-error').classList.remove('hidden');
+            isValid = false;
+        }
 
-            if (username.length > 150) {
-                document.getElementById('username-error').textContent = 'Имя пользователя должно содержать не более 150 символов';
-                document.getElementById('username-error').classList.remove('hidden');
-                isValid = false;
-            }
+        if (password.length < 8) {
+            document.getElementById('password-error').textContent = 'Пароль должен содержать не менее 8 символов';
+            document.getElementById('password-error').classList.remove('hidden');
+            isValid = false;
+        }
 
-            if (password.length < 8) {
-                document.getElementById('password-error').textContent = 'Пароль должен содержать не менее 8 символов';
-                document.getElementById('password-error').classList.remove('hidden');
-                isValid = false;
-            }
+        if (password !== passwordConfirm) {
+            document.getElementById('password-confirm-error').textContent = 'Пароли не совпадают';
+            document.getElementById('password-confirm-error').classList.remove('hidden');
+            isValid = false;
+        }
 
-            if (password !== passwordConfirm) {
-                document.getElementById('password-confirm-error').textContent = 'Пароли не совпадают';
-                document.getElementById('password-confirm-error').classList.remove('hidden');
-                isValid = false;
-            }
+        if (!isValid) {
+            console.log('Валидация не пройдена');
+            return;
+        }
 
-            if (!isValid) {
-                console.log('Валидация не пройдена');
-                return;
-            }
+        console.log('Отправка данных в Supabase...', { username, email });
 
-            console.log('Отправка данных в Supabase...', { username, email });
-
-            try {
-                // Регистрация в Supabase
-                const { data, error } = await supabase
-                    .from('users')
-                    .insert([
-                        {
-                            username: username,
-                            email: email,
-                            password: password
-                        }
-                    ])
-                    .select()
-                    .single();
-
-                console.log('Ответ от Supabase:', { data, error });
-
-                if (error) {
-                    console.error('Ошибка Supabase:', error);
-                    if (error.code === '23505') {
-                        document.getElementById('username-error').textContent = 'Пользователь с таким именем или email уже существует';
-                        document.getElementById('username-error').classList.remove('hidden');
-                    } else {
-                        document.getElementById('username-error').textContent = 'Ошибка регистрации: ' + error.message;
-                        document.getElementById('username-error').classList.remove('hidden');
+        try {
+            // Регистрация в Supabase
+            const { data, error } = await supabaseClient
+                .from('users')
+                .insert([
+                    {
+                        username: username,
+                        email: email,
+                        password: password
                     }
+                ])
+                .select()
+                .single();
+
+            console.log('Ответ от Supabase:', { data, error });
+
+            if (error) {
+                console.error('Ошибка Supabase:', error);
+                if (error.code === '23505') {
+                    document.getElementById('username-error').textContent = 'Пользователь с таким именем или email уже существует';
+                    document.getElementById('username-error').classList.remove('hidden');
                 } else {
-                    console.log('Регистрация успешна!');
-                    document.getElementById('success-message').textContent = 'Регистрация прошла успешно! Теперь вы можете войти в систему.';
-                    document.getElementById('success-message').classList.remove('hidden');
-                    document.getElementById('register-form').reset();
-                    
-                    setTimeout(() => {
-                        window.location.href = 'auth.html';
-                    }, 2000);
+                    document.getElementById('username-error').textContent = 'Ошибка регистрации: ' + error.message;
+                    document.getElementById('username-error').classList.remove('hidden');
                 }
-            } catch (error) {
-                console.error('Ошибка сети:', error);
-                document.getElementById('username-error').textContent = 'Ошибка соединения с сервером: ' + error.message;
-                document.getElementById('username-error').classList.remove('hidden');
+            } else {
+                console.log('Регистрация успешна!');
+                document.getElementById('success-message').textContent = 'Регистрация прошла успешно! Теперь вы можете войти в систему.';
+                document.getElementById('success-message').classList.remove('hidden');
+                document.getElementById('register-form').reset();
+                
+                setTimeout(() => {
+                    window.location.href = 'auth.html';
+                }, 2000);
             }
-        });
-    </script>
-</body>
-</html>
+        } catch (error) {
+            console.error('Ошибка сети:', error);
+            document.getElementById('username-error').textContent = 'Ошибка соединения с сервером: ' + error.message;
+            document.getElementById('username-error').classList.remove('hidden');
+        }
+    });
+</script>
