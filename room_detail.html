@@ -3,616 +3,388 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Чат-комната</title>
+    <title>Чат комнаты - Чат-комнаты</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: #f0f2f5;
+            background-color: #f5f5f5;
             color: #333;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .container {
-            max-width: 100%;
+            line-height: 1.6;
             height: 100vh;
             display: flex;
             flex-direction: column;
         }
-
-        .room-header {
-            background: white;
-            padding: 15px 20px;
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 20px;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .chat-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 30px;
+        }
+        
+        .chat-header {
+            padding: 20px;
             border-bottom: 1px solid #e0e0e0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-shrink: 0;
         }
-
-        .back-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 8px;
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .room-title {
-            font-size: 1.1rem;
-            font-weight: 600;
+        
+        .room-info h2 {
+            margin-bottom: 5px;
             color: #2c3e50;
-            text-align: center;
-            flex: 1;
         }
-
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .messages-list {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background: #f0f2f5;
-        }
-
-        .message {
-            display: flex;
-            gap: 8px;
-            align-items: flex-start;
-            max-width: 80%;
-        }
-
-        .message.own-message {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
-
-        .message-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #6c757d;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 0.8rem;
-            flex-shrink: 0;
-        }
-
-        .message.own-message .message-avatar {
-            background: #007bff;
-        }
-
-        .message-content {
-            background: white;
-            border-radius: 12px;
-            padding: 8px 12px;
-            border: 1px solid #e0e0e0;
-            position: relative;
-            max-width: 100%;
-        }
-
-        .message.own-message .message-content {
-            background: #007bff;
-            color: white;
-            border: none;
-        }
-
-        .message-username {
-            font-weight: 600;
-            font-size: 0.75rem;
-            margin-bottom: 2px;
-        }
-
-        .message-text {
+        
+        .room-info p {
+            color: #7f8c8d;
             font-size: 0.9rem;
-            margin-bottom: 16px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 70%;
+        }
+        
+        .message.own {
+            background-color: #e3f2fd;
+            margin-left: auto;
+        }
+        
+        .message.other {
+            background-color: #f5f5f5;
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .message-user {
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .message-time {
+            color: #95a5a6;
+        }
+        
+        .message-content {
             word-wrap: break-word;
         }
-
-        .message-time {
-            position: absolute;
-            bottom: 4px;
-            right: 8px;
-            font-size: 0.65rem;
-            opacity: 0.7;
-        }
-
-        .message-input-area {
-            padding: 12px 15px;
+        
+        .chat-input {
+            padding: 20px;
             border-top: 1px solid #e0e0e0;
-            background: white;
-            flex-shrink: 0;
-        }
-
-        .message-form {
             display: flex;
             gap: 10px;
-            align-items: flex-end;
         }
-
-        .message-input {
+        
+        .chat-input input {
             flex: 1;
-            padding: 12px 16px;
+            padding: 10px;
             border: 1px solid #e0e0e0;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            outline: none;
-            resize: none;
-            min-height: 40px;
-            max-height: 120px;
-            font-family: inherit;
+            border-radius: 4px;
+            font-size: 1rem;
         }
-
-        .send-btn {
-            background: #007bff;
+        
+        footer {
+            background-color: #2c3e50;
             color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 12px 20px;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-
-        .send-btn:hover {
-            background: #0056b3;
-        }
-
-        .guest-notice {
-            background: #fff3cd;
-            color: #856404;
-            padding: 12px;
-            border-radius: 8px;
             text-align: center;
-            margin: 10px;
-            border: 1px solid #ffeaa7;
+            padding: 20px 0;
         }
-
-        .empty-messages {
-            text-align: center;
-            padding: 40px 20px;
-            color: #8e8e93;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .system-message {
-            align-self: center;
-            background: #e3f2fd;
-            color: #1976d2;
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            margin: 5px 0;
-            max-width: 60%;
-            text-align: center;
-        }
-    {% extends 'base.html' %}
-
-{% block title %}Комната: {{ room.name }}{% endblock %}
-
-{% block header_title %}
-    Название Чата: {{ room.name }}
-    <div class="stats-toggle">
-        <button class="stats-circle" onclick="toggleStats()">i</button>
-        <div class="stats-popup" id="statsPopup">
-            <h3>Статистика чата</h3>
-            <div class="stats-item">
-                <span>Участники:</span>
-                <span id="statParticipants">{{ room.participants_count }}</span>
-            </div>
-            <div class="stats-item">
-                <span>Сообщения:</span>
-                <span id="statMessages">{{ room.messages_count }}</span>
-            </div>
-            <div class="stats-item">
-                <span>Ссылки:</span>
-                <span id="statLinks">{{ room.links_count }}</span>
-            </div>
-            <div class="stats-item">
-                <span>Медиа:</span>
-                <span id="statMedia">{{ room.media_count }}</span>
-            </div>
-            <div class="stats-item">
-                <span>Файлы:</span>
-                <span id="statFiles">{{ room.files_count }}</span>
-            </div>
-            <div class="stats-item">
-                <span>Музыка:</span>
-                <span id="statMusic">{{ room.music_count }}</span>
-            </div>
-            <div class="stats-item">
-                <span>Голосовые:</span>
-                <span id="statVoice">{{ room.voice_messages_count }}</span>
-            </div>
-        </div>
-    </div>
-{% endblock %}
-
-{% block content %}
-    <!-- Админ панель (только для администраторов) -->
-    {% if user.is_staff %}
-    <div class="admin-panel">
-        <h2>Панель администратора</h2>
-        <div class="admin-controls">
-            <button class="admin-btn edit" onclick="editRoom({{ room.id }})">Редактировать комнату</button>
-            <button class="admin-btn" onclick="deleteRoom({{ room.id }})">Удалить комнату</button>
-            <a href="{% url 'manage_users' %}" class="admin-btn">Управление пользователями</a>
-        </div>
-    </div>
-    {% endif %}
-
-    <div class="chat-container">
-        <div class="sidebar">
-            <h3>Участники ({{ room.participants.count }})</h3>
-            <div class="participants-list">
-                {% for participant in room.participants.all %}
-                    <div class="participant">
-                        {{ participant.username }}
-                        {% if participant.is_staff %}
-                            <span style="color: #dc3545;">(Admin)</span>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
         
-        <div class="chat-main">
-            <div class="chat-messages" id="chatMessages">
-                {% for message in messages %}
-                    <div class="message">
-                        <strong>{{ message.user.username }}:</strong>
-                        {{ message.content }}
-                        <small>{{ message.timestamp|date:"H:i" }}</small>
-                    </div>
-                {% endfor %}
-            </div>
-            
-            <div class="message-input">
-                <input type="text" id="messageInput" placeholder="Введите сообщение...">
-                <button onclick="sendMessage({{ room.id }})">Отправить</button>
-            </div>
-        </div>
-    </div>
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-    function editRoom(roomId) {
-        window.location.href = `/rooms/${roomId}/edit/`;
-    }
-
-    function sendMessage(roomId) {
-        const messageInput = document.getElementById('messageInput');
-        const content = messageInput.value.trim();
-        
-        if (content) {
-            fetch(`/rooms/${roomId}/send_message/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    'content': content
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    messageInput.value = '';
-                    // Обновить сообщения (в реальном приложении через WebSockets)
-                    location.reload();
-                }
-            });
+        .hidden {
+            display: none;
         }
-    }
-
-    // WebSocket подключение для реального времени
-    // Здесь можно добавить WebSocket логику для обновления сообщений
-</script>
-{% endblock %}
-
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="room-header">
-            <a href="index.html" class="back-btn">← Назад</a>
-            <div class="room-title" id="roomTitle">💬 Загрузка...</div>
+    <header>
+        <div class="container header-content">
+            <div class="logo">Чат-комнаты</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="home.html">Чат</a></li>
+                    <li><a href="create_room.html">Создать комнату</a></li>
+                </ul>
+            </nav>
+            <div class="user-info">
+                <span id="username-display">Гость</span>
+                <button class="btn btn-secondary" id="logout-btn">Выйти</button>
+            </div>
         </div>
+    </header>
 
+    <div class="container">
         <div class="chat-container">
-            <div class="messages-list" id="messagesList">
-                <div class="empty-messages">
-                    <div style="font-size: 2rem; margin-bottom: 10px;">💬</div>
-                    <h3>Загрузка чата...</h3>
+            <div class="chat-header">
+                <div class="room-info">
+                    <h2 id="room-name">Название комнаты</h2>
+                    <p id="room-description">Описание комнаты</p>
+                </div>
+                <div class="room-actions">
+                    <a href="home.html" class="btn btn-secondary">Назад к комнатам</a>
+                    <a href="#" id="delete-room-btn" class="btn btn-danger hidden">Удалить комнату</a>
                 </div>
             </div>
-
-            <div class="message-input-area" id="messageInputArea">
-                <!-- Форма ввода сообщения будет добавлена JavaScript -->
+            
+            <div class="chat-messages" id="chat-messages">
+                <!-- Сообщения будут загружены через JavaScript -->
+            </div>
+            
+            <div class="chat-input">
+                <input type="text" id="message-input" placeholder="Введите ваше сообщение...">
+                <button class="btn" id="send-message">Отправить</button>
             </div>
         </div>
     </div>
 
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Чат-комнаты. Все права защищены.</p>
+        </div>
+    </footer>
+
     <script>
-        // Глобальные переменные
-        let currentUser = null;
         let currentRoom = null;
-        let messages = [];
+        let currentUser = null;
 
-        // Инициализация чата
-        function initChat() {
-            // Получаем данные из localStorage
-            currentUser = localStorage.getItem('currentUser');
-            currentRoom = localStorage.getItem('currentRoom');
-
-            if (!currentUser) {
-                showGuestNotice();
-                return;
+        function checkAuth() {
+            const user = localStorage.getItem('currentUser');
+            if (!user) {
+                window.location.href = 'auth.html';
+                return null;
             }
+            return JSON.parse(user);
+        }
 
+        function loadRoom() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomId = urlParams.get('room');
+            
+            const rooms = JSON.parse(localStorage.getItem('chatRooms') || '[]');
+            currentRoom = rooms.find(room => room.id === roomId);
+            
             if (!currentRoom) {
-                currentRoom = 'general';
-            }
-
-            // Устанавливаем название комнаты
-            const roomTitles = {
-                'general': '🌐 Общая комната',
-                'tech': '💻 Технические вопросы', 
-                'games': '🎮 Игры и развлечения'
-            };
-            document.getElementById('roomTitle').textContent = roomTitles[currentRoom] || '💬 Чат-комната';
-
-            // Показываем интерфейс чата
-            showChatInterface();
-
-            // Загружаем сообщения
-            loadMessages();
-
-            // Добавляем приветственное сообщение
-            addSystemMessage(`Добро пожаловать в чат, ${currentUser}!`);
-        }
-
-        // Показ уведомления для гостей
-        function showGuestNotice() {
-            const messagesList = document.getElementById('messagesList');
-            const messageInputArea = document.getElementById('messageInputArea');
-            
-            messagesList.innerHTML = `
-                <div class="empty-messages">
-                    <div style="font-size: 2rem; margin-bottom: 10px;">🔒</div>
-                    <h3>Доступ запрещен</h3>
-                    <p>Для доступа к чату необходимо войти в систему</p>
-                </div>
-            `;
-            
-            messageInputArea.innerHTML = `
-                <div class="guest-notice">
-                    <p>🔒 <a href="auth.html" style="color: #007bff; text-decoration: none; font-weight: 600;">Войдите</a> или <a href="register.html" style="color: #007bff; text-decoration: none; font-weight: 600;">зарегистрируйтесь</a> для общения в чате</p>
-                </div>
-            `;
-        }
-
-        // Показ интерфейса чата
-        function showChatInterface() {
-            const messageInputArea = document.getElementById('messageInputArea');
-            
-            messageInputArea.innerHTML = `
-                <form class="message-form" id="messageForm">
-                    <textarea 
-                        class="message-input" 
-                        id="messageInput"
-                        placeholder="Напишите сообщение..." 
-                        required
-                        rows="1"
-                    ></textarea>
-                    <button type="submit" class="send-btn">Отправить</button>
-                </form>
-            `;
-
-            // Настраиваем обработчик формы
-            document.getElementById('messageForm').addEventListener('submit', sendMessage);
-            
-            // Настраиваем авто-размер textarea
-            const messageInput = document.getElementById('messageInput');
-            messageInput.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-            });
-        }
-
-        // Загрузка сообщений
-        function loadMessages() {
-            // Загружаем сообщения из localStorage
-            const savedMessages = localStorage.getItem(`messages_${currentRoom}`);
-            if (savedMessages) {
-                messages = JSON.parse(savedMessages);
-            } else {
-                // Начальные сообщения для демонстрации
-                messages = [
-                    {
-                        user: 'Бот',
-                        text: 'Добро пожаловать в чат! Здесь вы можете общаться с другими участниками.',
-                        time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
-                        type: 'system'
-                    },
-                    {
-                        user: 'Администратор', 
-                        text: 'Приветствуем нового участника!',
-                        time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
-                        type: 'user'
-                    }
-                ];
-                saveMessages();
-            }
-
-            displayMessages();
-        }
-
-        // Отображение сообщений
-        function displayMessages() {
-            const messagesList = document.getElementById('messagesList');
-            messagesList.innerHTML = '';
-
-            if (messages.length === 0) {
-                messagesList.innerHTML = `
-                    <div class="empty-messages">
-                        <div style="font-size: 2rem; margin-bottom: 10px;">💬</div>
-                        <h3>Здесь пока тихо</h3>
-                        <p>Будьте первым, кто напишет сообщение!</p>
-                    </div>
-                `;
+                window.location.href = 'home.html';
                 return;
             }
-
-            messages.forEach(message => {
-                if (message.type === 'system') {
-                    const systemMsg = document.createElement('div');
-                    systemMsg.className = 'system-message';
-                    systemMsg.textContent = message.text;
-                    messagesList.appendChild(systemMsg);
-                } else {
-                    const messageDiv = document.createElement('div');
-                    const isOwnMessage = message.user === currentUser;
-                    
-                    messageDiv.className = `message ${isOwnMessage ? 'own-message' : ''}`;
-                    messageDiv.innerHTML = `
-                        <div class="message-avatar">${message.user[0].toUpperCase()}</div>
-                        <div class="message-content">
-                            <div class="message-username">
-                                ${isOwnMessage ? 'Вы' : message.user}
-                            </div>
-                            <div class="message-text">${message.text}</div>
-                            <div class="message-time">${message.time}</div>
-                        </div>
-                    `;
-                    
-                    messagesList.appendChild(messageDiv);
-                }
-            });
-
-            scrollToBottom();
+            
+            document.getElementById('room-name').textContent = currentRoom.name;
+            document.getElementById('room-description').textContent = currentRoom.description;
+            
+            // Показываем кнопку удаления только создателю комнаты
+            if (currentRoom.creator === currentUser.username) {
+                document.getElementById('delete-room-btn').classList.remove('hidden');
+                document.getElementById('delete-room-btn').href = 'delete_room.html?room=' + currentRoom.id;
+            }
+            
+            loadMessages();
         }
 
-        // Отправка сообщения
-        function sendMessage(e) {
-            e.preventDefault();
+        function loadMessages() {
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.innerHTML = '';
             
-            const messageInput = document.getElementById('messageInput');
-            const text = messageInput.value.trim();
+            if (currentRoom.messages && currentRoom.messages.length > 0) {
+                currentRoom.messages.forEach(message => {
+                    addMessageToChat(message, false);
+                });
+            } else {
+                messagesContainer.innerHTML = '<div class="message other"><div class="message-content">Пока нет сообщений. Будьте первым!</div></div>';
+            }
             
-            if (!text) return;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
 
-            // Создаем новое сообщение
+        function addMessageToChat(message, scroll = true) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageElement = document.createElement('div');
+            
+            const isOwnMessage = message.sender === currentUser.username;
+            messageElement.className = `message ${isOwnMessage ? 'own' : 'other'}`;
+            
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            messageElement.innerHTML = `
+                <div class="message-header">
+                    <span class="message-user">${message.sender}</span>
+                    <span class="message-time">${timeStr}</span>
+                </div>
+                <div class="message-content">${message.content}</div>
+            `;
+            
+            messagesContainer.appendChild(messageElement);
+            
+            if (scroll) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('message-input');
+            const content = messageInput.value.trim();
+            
+            if (!content) return;
+            
             const newMessage = {
-                user: currentUser,
-                text: text,
-                time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
-                type: 'user'
-            };
-
-            // Добавляем в массив сообщений
-            messages.push(newMessage);
-            
-            // Сохраняем в localStorage
-            saveMessages();
-            
-            // Отображаем сообщение
-            displayMessages();
-            
-            // Очищаем поле ввода
-            messageInput.value = '';
-            messageInput.style.height = 'auto';
-            
-            // Прокручиваем вниз
-            scrollToBottom();
-
-            // Авто-ответ для демонстрации
-            setTimeout(() => {
-                if (Math.random() > 0.7) { // 30% шанс на авто-ответ
-                    const autoResponses = [
-                        "Интересное сообщение!",
-                        "Спасибо за ваше сообщение!",
-                        "Продолжайте в том же духе!",
-                        "Отличная мысль!",
-                        "Я тоже так думаю!"
-                    ];
-                    const autoResponse = autoResponses[Math.floor(Math.random() * autoResponses.length)];
-                    
-                    const botMessage = {
-                        user: 'Бот',
-                        text: autoResponse,
-                        time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
-                        type: 'user'
-                    };
-                    
-                    messages.push(botMessage);
-                    saveMessages();
-                    displayMessages();
-                }
-            }, 1000 + Math.random() * 2000);
-        }
-
-        // Добавление системного сообщения
-        function addSystemMessage(text) {
-            const systemMessage = {
-                user: 'Система',
-                text: text,
-                time: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
-                type: 'system'
+                id: Date.now().toString(),
+                content: content,
+                sender: currentUser.username,
+                timestamp: new Date().toISOString()
             };
             
-            messages.push(systemMessage);
-            saveMessages();
-            displayMessages();
-        }
-
-        // Сохранение сообщений в localStorage
-        function saveMessages() {
-            localStorage.setItem(`messages_${currentRoom}`, JSON.stringify(messages));
-        }
-
-        // Прокрутка вниз
-        function scrollToBottom() {
-            const messagesList = document.getElementById('messagesList');
-            messagesList.scrollTop = messagesList.scrollHeight;
-        }
-
-        // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            initChat();
+            // Добавляем сообщение в комнату
+            const rooms = JSON.parse(localStorage.getItem('chatRooms') || '[]');
+            const roomIndex = rooms.findIndex(room => room.id === currentRoom.id);
             
-            // Фокус на поле ввода
-            setTimeout(() => {
-                const messageInput = document.getElementById('messageInput');
-                if (messageInput) {
-                    messageInput.focus();
+            if (roomIndex !== -1) {
+                if (!rooms[roomIndex].messages) {
+                    rooms[roomIndex].messages = [];
                 }
-            }, 100);
+                rooms[roomIndex].messages.push(newMessage);
+                localStorage.setItem('chatRooms', JSON.stringify(rooms));
+                
+                // Обновляем текущую комнату
+                currentRoom = rooms[roomIndex];
+                
+                // Добавляем сообщение в чат
+                addMessageToChat(newMessage);
+                
+                // Очищаем поле ввода
+                messageInput.value = '';
+            }
+        }
+
+        document.getElementById('send-message').addEventListener('click', sendMessage);
+
+        document.getElementById('message-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
         });
-    </script>
-</body>
-</html>
+
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            currentUser = checkAuth();
+            if (currentUser) {
+                document.getElementById('username-display').textContent = currentUser.username;
+                loadRoom();
+            }
+       
