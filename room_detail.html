@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Чат комнаты - Чат-комнаты</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <style>
         * {
             margin: 0;
@@ -235,12 +237,14 @@
                 </div>
                 <div class="room-actions">
                     <a href="home.html" class="btn btn-secondary">Назад к комнатам</a>
-                    <a href="#" id="delete-room-btn" class="btn btn-danger hidden">Удалить комнату</a>
+                    <button id="delete-room-btn" class="btn btn-danger hidden">Удалить комнату</button>
                 </div>
             </div>
             
             <div class="chat-messages" id="chat-messages">
-                <!-- Сообщения будут загружены через JavaScript -->
+                <div class="message other">
+                    <div class="message-content">Загрузка сообщений...</div>
+                </div>
             </div>
             
             <div class="chat-input">
@@ -257,10 +261,13 @@
     </footer>
 
     <script>
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
         let currentRoom = null;
         let currentUser = null;
+        let messageSubscription = null;
 
-        function checkAuth() {
+        async function checkAuth() {
             const user = localStorage.getItem('currentUser');
             if (!user) {
                 window.location.href = 'auth.html';
@@ -269,41 +276,81 @@
             return JSON.parse(user);
         }
 
-        function loadRoom() {
+        async function loadRoom() {
             const urlParams = new URLSearchParams(window.location.search);
             const roomId = urlParams.get('room');
             
-            const rooms = JSON.parse(localStorage.getItem('chatRooms') || '[]');
-            currentRoom = rooms.find(room => room.id === roomId);
-            
-            if (!currentRoom) {
+            if (!roomId) {
                 window.location.href = 'home.html';
                 return;
             }
-            
-            document.getElementById('room-name').textContent = currentRoom.name;
-            document.getElementById('room-description').textContent = currentRoom.description;
-            
-            // Показываем кнопку удаления только создателю комнаты
-            if (currentRoom.creator === currentUser.username) {
-                document.getElementById('delete-room-btn').classList.remove('hidden');
-                document.getElementById('delete-room-btn').href = 'delete_room.html?room=' + currentRoom.id;
+
+            try {
+                const { data: room, error } = await supabase
+                    .from('rooms')
+                    .select(`
+                        *,
+                        users:creator_id(username)
+                    `)
+                    .eq('id', roomId)
+                    .single();
+
+                if (error || !room) {
+                    window.location.href = 'home.html';
+                    return;
+                }
+
+                currentRoom = room;
+                document.getElementById('room-name').textContent = room.name;
+                document.getElementById('room-description').textContent = room.description || 'Нет описания';
+
+                // Показываем кнопку удаления только создателю комнаты
+                if (room.creator_id === currentUser.id) {
+                    document.getElementById('delete-room-btn').classList.remove('hidden');
+                }
+
+                loadMessages();
+                setupRealtimeMessages();
+
+            } catch (error) {
+                console.error('Ошибка загрузки комнаты:', error);
             }
-            
-            loadMessages();
         }
 
-        function loadMessages() {
-            const messagesContainer = document.getElementById('chat-messages');
-            messagesContainer.innerHTML = '';
-            
-            if (currentRoom.messages && currentRoom.messages.length > 0) {
-                currentRoom.messages.forEach(message => {
-                    addMessageToChat(message, false);
-                });
-            } else {
-                messagesContainer.innerHTML = '<div class="message other"><div class="message-content">Пока нет сообщений. Будьте первым!</div></div>';
+        async function loadMessages() {
+            try {
+                const { data: messages, error } = await supabase
+                    .from('messages')
+                    .select(`
+                        *,
+                        users:user_id(username)
+                    `)
+                    .eq('room_id', currentRoom.id)
+                    .order('created_at', { ascending: true });
+
+                if (error) {
+                    console.error('Ошибка загрузки сообщений:', error);
+                    return;
+                }
+
+                displayMessages(messages);
+            } catch (error) {
+                console.error('Ошибка:', error);
             }
+        }
+
+        function displayMessages(messages) {
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            if (messages.length === 0) {
+                messagesContainer.innerHTML = '<div class="message other"><div class="message-content">Пока нет сообщений. Будьте первым!</div></div>';
+                return;
+            }
+
+            messagesContainer.innerHTML = '';
+            messages.forEach(message => {
+                addMessageToChat(message, false);
+            });
             
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
@@ -312,15 +359,15 @@
             const messagesContainer = document.getElementById('chat-messages');
             const messageElement = document.createElement('div');
             
-            const isOwnMessage = message.sender === currentUser.username;
+            const isOwnMessage = message.user_id === currentUser.id;
             messageElement.className = `message ${isOwnMessage ? 'own' : 'other'}`;
             
-            const now = new Date();
-            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            const time = new Date(message.created_at);
+            const timeStr = `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`;
             
             messageElement.innerHTML = `
                 <div class="message-header">
-                    <span class="message-user">${message.sender}</span>
+                    <span class="message-user">${message.users.username}</span>
                     <span class="message-time">${timeStr}</span>
                 </div>
                 <div class="message-content">${message.content}</div>
@@ -333,58 +380,115 @@
             }
         }
 
-        function sendMessage() {
+        function setupRealtimeMessages() {
+            // Отписываемся от предыдущей подписки
+            if (messageSubscription) {
+                supabase.removeChannel(messageSubscription);
+            }
+
+            // Подписываемся на новые сообщения
+            messageSubscription = supabase
+                .channel('room-messages')
+                .on('postgres_changes', 
+                    { 
+                        event: 'INSERT', 
+                        schema: 'public', 
+                        table: 'messages',
+                        filter: `room_id=eq.${currentRoom.id}`
+                    }, 
+                    (payload) => {
+                        // Загружаем полные данные сообщения с именем пользователя
+                        supabase
+                            .from('messages')
+                            .select(`
+                                *,
+                                users:user_id(username)
+                            `)
+                            .eq('id', payload.new.id)
+                            .single()
+                            .then(({ data: message }) => {
+                                if (message) {
+                                    addMessageToChat(message);
+                                }
+                            });
+                    }
+                )
+                .subscribe();
+        }
+
+        async function sendMessage() {
             const messageInput = document.getElementById('message-input');
             const content = messageInput.value.trim();
             
             if (!content) return;
-            
-            const newMessage = {
-                id: Date.now().toString(),
-                content: content,
-                sender: currentUser.username,
-                timestamp: new Date().toISOString()
-            };
-            
-            // Добавляем сообщение в комнату
-            const rooms = JSON.parse(localStorage.getItem('chatRooms') || '[]');
-            const roomIndex = rooms.findIndex(room => room.id === currentRoom.id);
-            
-            if (roomIndex !== -1) {
-                if (!rooms[roomIndex].messages) {
-                    rooms[roomIndex].messages = [];
+
+            try {
+                const { error } = await supabase
+                    .from('messages')
+                    .insert([
+                        {
+                            room_id: currentRoom.id,
+                            user_id: currentUser.id,
+                            content: content
+                        }
+                    ]);
+
+                if (error) {
+                    console.error('Ошибка отправки сообщения:', error);
+                } else {
+                    messageInput.value = '';
                 }
-                rooms[roomIndex].messages.push(newMessage);
-                localStorage.setItem('chatRooms', JSON.stringify(rooms));
-                
-                // Обновляем текущую комнату
-                currentRoom = rooms[roomIndex];
-                
-                // Добавляем сообщение в чат
-                addMessageToChat(newMessage);
-                
-                // Очищаем поле ввода
-                messageInput.value = '';
+            } catch (error) {
+                console.error('Ошибка:', error);
+            }
+        }
+
+        async function deleteRoom() {
+            if (!confirm('Вы уверены, что хотите удалить эту комнату? Все сообщения будут удалены.')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('rooms')
+                    .delete()
+                    .eq('id', currentRoom.id);
+
+                if (error) {
+                    alert('Ошибка при удалении комнаты: ' + error.message);
+                } else {
+                    window.location.href = 'home.html';
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
             }
         }
 
         document.getElementById('send-message').addEventListener('click', sendMessage);
-
         document.getElementById('message-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
 
+        document.getElementById('delete-room-btn').addEventListener('click', deleteRoom);
         document.getElementById('logout-btn').addEventListener('click', function() {
             localStorage.removeItem('currentUser');
             window.location.href = 'index.html';
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            currentUser = checkAuth();
+        document.addEventListener('DOMContentLoaded', async function() {
+            currentUser = await checkAuth();
             if (currentUser) {
                 document.getElementById('username-display').textContent = currentUser.username;
-                loadRoom();
+                await loadRoom();
             }
-       
+        });
+
+        // Отписываемся при закрытии страницы
+        window.addEventListener('beforeunload', function() {
+            if (messageSubscription) {
+                supabase.removeChannel(messageSubscription);
+            }
+        });
+    </script>
+</body>
+</html>
