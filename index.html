@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Чат-комнаты</title>
     <style>
+        /* Стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -68,6 +69,13 @@
             gap: 10px;
         }
         
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+        
         .btn {
             display: inline-block;
             background-color: #3498db;
@@ -92,6 +100,14 @@
         
         .btn-secondary:hover {
             background-color: #7f8c8d;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
         }
         
         .hero {
@@ -204,13 +220,17 @@
             <nav>
                 <ul>
                     <li><a href="index.html">Главная</a></li>
-                    <li><a href="home.html" id="chat-link">Чат</a></li>
-                    <li><a href="create_room.html">Создать комнату</a></li>
-                    <li><a href="register.html">Регистрация</a></li>
+                    <li><a href="home.html" id="chat-link" class="hidden">Чат</a></li>
+                    <li><a href="create_room.html" class="hidden">Создать комнату</a></li>
+                    <li><a href="register.html" id="register-link">Регистрация</a></li>
                 </ul>
             </nav>
-            <div class="auth-buttons">
+            <div class="auth-buttons" id="auth-buttons">
                 <a href="auth.html" class="btn">Вход</a>
+            </div>
+            <div class="user-info hidden" id="user-info">
+                <span id="username-display">Пользователь</span>
+                <button class="btn btn-danger" id="logout-btn">Выйти</button>
             </div>
         </div>
     </header>
@@ -256,18 +276,57 @@
     </footer>
 
     <script>
-        function checkAuth() {
+        function updateAuthUI() {
             const user = localStorage.getItem('currentUser');
+            const authButtons = document.getElementById('auth-buttons');
+            const userInfo = document.getElementById('user-info');
+            const authRequired = document.getElementById('auth-required');
+            const chatSection = document.getElementById('chat-section');
+            const chatLink = document.getElementById('chat-link');
+            const createRoomLinks = document.querySelectorAll('a[href="create_room.html"]');
+            const registerLink = document.getElementById('register-link');
+
             if (user) {
-                document.getElementById('auth-required').classList.add('hidden');
-                document.getElementById('chat-section').classList.remove('hidden');
+                const userData = JSON.parse(user);
+                // Показываем информацию о пользователе
+                authButtons.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                document.getElementById('username-display').textContent = userData.username;
+                
+                // Показываем секцию чата
+                authRequired.classList.add('hidden');
+                chatSection.classList.remove('hidden');
+                
+                // Показываем ссылки на чат
+                chatLink.classList.remove('hidden');
+                createRoomLinks.forEach(link => link.classList.remove('hidden'));
+                registerLink.classList.add('hidden');
             } else {
-                document.getElementById('auth-required').classList.remove('hidden');
-                document.getElementById('chat-section').classList.add('hidden');
+                // Показываем кнопки авторизации
+                authButtons.classList.remove('hidden');
+                userInfo.classList.add('hidden');
+                
+                // Показываем требование авторизации
+                authRequired.classList.remove('hidden');
+                chatSection.classList.add('hidden');
+                
+                // Скрываем ссылки на чат
+                chatLink.classList.add('hidden');
+                createRoomLinks.forEach(link => link.classList.add('hidden'));
+                registerLink.classList.remove('hidden');
             }
         }
 
-        document.addEventListener('DOMContentLoaded', checkAuth);
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('currentUser');
+            updateAuthUI();
+        });
+
+        // Проверяем авторизацию при загрузке страницы
+        document.addEventListener('DOMContentLoaded', updateAuthUI);
+
+        // Также обновляем при возвращении на страницу (например, после входа)
+        window.addEventListener('pageshow', updateAuthUI);
     </script>
 </body>
 </html>
