@@ -147,9 +147,22 @@
     </div>
 
     <script>
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+        // Инициализация Supabase после загрузки страницы
+        let supabase;
+        
         document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем что конфиг загружен
+            if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+                console.error('Config не загружен! Проверьте config.js');
+                document.getElementById('error-message').textContent = 'Ошибка конфигурации. Проверьте config.js';
+                document.getElementById('error-message').classList.remove('hidden');
+                return;
+            }
+            
+            supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase инициализирован');
+
+            // Проверка авторизации
             const user = localStorage.getItem('currentUser');
             if (user) {
                 window.location.href = 'index.html';
@@ -158,6 +171,12 @@
 
         document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            // Ждем инициализации supabase
+            if (!supabase) {
+                console.error('Supabase не инициализирован');
+                return;
+            }
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
