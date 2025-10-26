@@ -121,11 +121,6 @@
             margin-bottom: 30px;
         }
         
-        .content h2 {
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-        
         .welcome-section {
             text-align: center;
             padding: 40px 0;
@@ -261,7 +256,6 @@
     </footer>
 
     <script>
-        // Проверка авторизации пользователя
         function checkAuth() {
             const user = localStorage.getItem('currentUser');
             if (user) {
@@ -273,7 +267,6 @@
             }
         }
 
-        // Проверка авторизации при загрузке страницы
         document.addEventListener('DOMContentLoaded', checkAuth);
     </script>
 </body>
