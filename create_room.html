@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Создать комнату - Чат-комнаты</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <style>
         * {
             margin: 0;
@@ -122,7 +124,7 @@
             font-weight: bold;
         }
         
-        .form-group input, .form-group textarea {
+        .form-group input, .form-group textarea, .form-group select {
             width: 100%;
             padding: 10px;
             border: 1px solid #e0e0e0;
@@ -223,7 +225,9 @@
     </footer>
 
     <script>
-        function checkAuth() {
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function checkAuth() {
             const user = localStorage.getItem('currentUser');
             if (!user) {
                 window.location.href = 'auth.html';
@@ -232,7 +236,7 @@
             return JSON.parse(user);
         }
 
-        document.getElementById('create-room-form').addEventListener('submit', function(e) {
+        document.getElementById('create-room-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const roomName = document.getElementById('room-name').value;
@@ -240,27 +244,32 @@
             const roomPrivacy = document.getElementById('room-privacy').value;
             const user = JSON.parse(localStorage.getItem('currentUser'));
             
-            const rooms = JSON.parse(localStorage.getItem('chatRooms') || '[]');
-            
-            const newRoom = {
-                id: Date.now().toString(),
-                name: roomName,
-                description: roomDescription,
-                privacy: roomPrivacy,
-                creator: user.username,
-                createdAt: new Date().toISOString(),
-                participants: 1,
-                messages: []
-            };
-            
-            rooms.push(newRoom);
-            localStorage.setItem('chatRooms', JSON.stringify(rooms));
-            
-            document.getElementById('success-message').classList.remove('hidden');
-            
-            setTimeout(() => {
-                window.location.href = 'room_detail.html?room=' + newRoom.id;
-            }, 1500);
+            try {
+                const { data, error } = await supabase
+                    .from('rooms')
+                    .insert([
+                        {
+                            name: roomName,
+                            description: roomDescription,
+                            privacy: roomPrivacy,
+                            creator_id: user.id
+                        }
+                    ])
+                    .select()
+                    .single();
+
+                if (error) {
+                    alert('Ошибка создания комнаты: ' + error.message);
+                } else {
+                    document.getElementById('success-message').classList.remove('hidden');
+                    
+                    setTimeout(() => {
+                        window.location.href = `room_detail.html?room=${data.id}`;
+                    }, 1500);
+                }
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
         });
 
         document.getElementById('logout-btn').addEventListener('click', function() {
@@ -268,8 +277,8 @@
             window.location.href = 'index.html';
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const user = checkAuth();
+        document.addEventListener('DOMContentLoaded', async function() {
+            const user = await checkAuth();
             if (user) {
                 document.getElementById('username-display').textContent = user.username;
             }
