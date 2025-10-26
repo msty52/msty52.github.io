@@ -146,63 +146,68 @@
         </div>
     </div>
 
-    <script>
-        // Инициализация Supabase после загрузки страницы
-        let supabase;
+  <script>
+    // Инициализация Supabase после загрузки страницы
+    let supabaseClient;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Проверяем что конфиг загружен
+        if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+            console.error('Config не загружен! Проверьте config.js');
+            document.getElementById('error-message').textContent = 'Ошибка конфигурации. Проверьте config.js';
+            document.getElementById('error-message').classList.remove('hidden');
+            return;
+        }
         
-        document.addEventListener('DOMContentLoaded', function() {
-            // Проверяем что конфиг загружен
-            if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
-                console.error('Config не загружен! Проверьте config.js');
-                document.getElementById('error-message').textContent = 'Ошибка конфигурации. Проверьте config.js';
-                document.getElementById('error-message').classList.remove('hidden');
-                return;
-            }
-            
-            supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('Supabase инициализирован');
+        console.log('Инициализация Supabase...', SUPABASE_URL);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase инициализирован');
 
-            // Проверка авторизации
-            const user = localStorage.getItem('currentUser');
-            if (user) {
+        // Проверка авторизации
+        const user = localStorage.getItem('currentUser');
+        if (user) {
+            window.location.href = 'index.html';
+        }
+    });
+
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Ждем инициализации supabase
+        if (!supabaseClient) {
+            console.error('Supabase не инициализирован');
+            document.getElementById('error-message').textContent = 'Supabase не инициализирован';
+            document.getElementById('error-message').classList.remove('hidden');
+            return;
+        }
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorMessage = document.getElementById('error-message');
+        
+        try {
+            console.log('Поиск пользователя:', username);
+            // Ищем пользователя в базе данных
+            const { data: user, error } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('username', username)
+                .eq('password', password)
+                .single();
+
+            console.log('Результат поиска:', { user, error });
+
+            if (error || !user) {
+                errorMessage.textContent = 'Неверное имя пользователя или пароль';
+                errorMessage.classList.remove('hidden');
+            } else {
+                localStorage.setItem('currentUser', JSON.stringify(user));
                 window.location.href = 'index.html';
             }
-        });
-
-        document.getElementById('login-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Ждем инициализации supabase
-            if (!supabase) {
-                console.error('Supabase не инициализирован');
-                return;
-            }
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('error-message');
-            
-            try {
-                // Ищем пользователя в базе данных
-                const { data: users, error } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('username', username)
-                    .eq('password', password)
-                    .single();
-
-                if (error || !users) {
-                    errorMessage.textContent = 'Неверное имя пользователя или пароль';
-                    errorMessage.classList.remove('hidden');
-                } else {
-                    localStorage.setItem('currentUser', JSON.stringify(users));
-                    window.location.href = 'index.html';
-                }
-            } catch (error) {
-                errorMessage.textContent = 'Ошибка соединения с сервером';
-                errorMessage.classList.remove('hidden');
-            }
-        });
-    </script>
-</body>
-</html>
+        } catch (error) {
+            console.error('Ошибка:', error);
+            errorMessage.textContent = 'Ошибка соединения с сервером: ' + error.message;
+            errorMessage.classList.remove('hidden');
+        }
+    });
+</script>
