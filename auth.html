@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход - Чат-комнаты</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <style>
         * {
             margin: 0;
@@ -145,7 +147,8 @@
     </div>
 
     <script>
-        // Проверяем, не авторизован ли пользователь уже
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         document.addEventListener('DOMContentLoaded', function() {
             const user = localStorage.getItem('currentUser');
             if (user) {
@@ -153,27 +156,31 @@
             }
         });
 
-        document.getElementById('login-form').addEventListener('submit', function(e) {
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const errorMessage = document.getElementById('error-message');
             
-            // Получаем зарегистрированных пользователей из localStorage
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            
-            // Проверяем существование пользователя
-            const user = users.find(u => u.username === username && u.password === password);
-            
-            if (user) {
-                // Сохраняем текущего пользователя
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                
-                // Перенаправляем на главную страницу
-                window.location.href = 'index.html';
-            } else {
-                errorMessage.textContent = 'Неверное имя пользователя или пароль';
+            try {
+                // Ищем пользователя в базе данных
+                const { data: users, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .single();
+
+                if (error || !users) {
+                    errorMessage.textContent = 'Неверное имя пользователя или пароль';
+                    errorMessage.classList.remove('hidden');
+                } else {
+                    localStorage.setItem('currentUser', JSON.stringify(users));
+                    window.location.href = 'index.html';
+                }
+            } catch (error) {
+                errorMessage.textContent = 'Ошибка соединения с сервером';
                 errorMessage.classList.remove('hidden');
             }
         });
