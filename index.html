@@ -30,6 +30,7 @@
             text-align: center;
             margin-bottom: 40px;
             color: white;
+            animation: fadeInDown 0.8s ease;
         }
 
         .header h1 {
@@ -54,6 +55,7 @@
             margin-bottom: 30px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideInUp 0.6s ease;
         }
 
         .user-menu-content {
@@ -80,6 +82,11 @@
             color: white;
             font-size: 1.2rem;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
         }
 
         .user-details h3 {
@@ -112,6 +119,27 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: width 0.3s, height 0.3s, top 0.3s, left 0.3s;
+        }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            left: -150px;
         }
 
         .btn-primary {
@@ -151,6 +179,7 @@
         /* Messages */
         .messages {
             margin-bottom: 20px;
+            animation: fadeIn 0.5s ease;
         }
 
         .alert {
@@ -158,6 +187,7 @@
             border-radius: 12px;
             margin-bottom: 15px;
             font-weight: 500;
+            animation: slideInRight 0.5s ease;
         }
 
         .alert-success {
@@ -172,10 +202,17 @@
             box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
         }
 
+        .alert-info {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
         /* Create Room Section */
         .create-room-section {
             text-align: center;
             margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease 0.2s both;
         }
 
         .create-room-btn {
@@ -199,6 +236,7 @@
             text-align: center;
             margin-bottom: 30px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.6s ease;
         }
 
         .guest-notice p {
@@ -225,6 +263,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            animation: fadeInUp 0.6s ease;
         }
 
         .room-card:hover {
@@ -255,6 +294,7 @@
             color: #333;
             text-decoration: none;
             flex: 1;
+            transition: color 0.3s ease;
         }
 
         .room-title:hover {
@@ -275,12 +315,21 @@
             font-size: 0.8rem;
             font-weight: 600;
             white-space: nowrap;
+            transition: transform 0.3s ease;
+        }
+
+        .room-card:hover .stat-badge {
+            transform: scale(1.05);
         }
 
         .room-description {
             color: #666;
             margin-bottom: 20px;
             line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .room-meta {
@@ -325,6 +374,7 @@
             text-align: center;
             padding: 60px 20px;
             color: white;
+            animation: fadeIn 0.8s ease;
         }
 
         .empty-state h2 {
@@ -346,6 +396,119 @@
             color: white;
             opacity: 0.7;
             font-size: 0.9rem;
+            animation: fadeIn 0.6s ease;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Search and Filter */
+        .search-filter {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .filter-select {
+            padding: 12px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
         /* Responsive */
@@ -378,6 +541,45 @@
                 margin-left: 0;
                 align-self: flex-start;
             }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .search-input, .filter-select {
+                min-width: 100%;
+            }
+        }
+
+        /* Scroll to top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1000;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
         }
     </style>
 </head>
@@ -389,10 +591,8 @@
             <p>Общайтесь в реальном времени с друзьями и коллегами</p>
         </div>
 
-        <!-- User Menu -->
         <div class="user-menu">
             <div class="user-menu-content">
-                {% if user.is_authenticated %}
                     <div class="user-info">
                         <div class="user-avatar">
                             {{ user.username|first|upper }}
@@ -407,7 +607,6 @@
                             🚪 Выйти
                         </a>
                     </div>
-                {% else %}
                     <div class="user-info">
                         <div class="user-details">
                             <h3>👋 Добро пожаловать!</h3>
@@ -422,29 +621,35 @@
                             👤 Регистрация
                         </a>
                     </div>
-                {% endif %}
             </div>
         </div>
 
-        <!-- Messages -->
-        {% if messages %}
             <div class="messages">
-                {% for message in messages %}
                     <div class="alert alert-{{ message.tags }}">
                         {{ message }}
                     </div>
-                {% endfor %}
             </div>
-        {% endif %}
 
-        <!-- Create Room Section -->
-        {% if user.is_authenticated %}
+        <!-- Search and Filter -->
+        <div class="search-filter">
+            <form class="search-form" method="GET" action="">
+                <input type="text" name="q" class="search-input" placeholder="🔍 Поиск по названию комнаты..." value="{{ request.GET.q }}">
+                <select name="filter" class="filter-select">
+                    <option value="">Все комнаты</option>
+                    <option value="public" {% if request.GET.filter == 'public' %}selected{% endif %}>Публичные</option>
+                    <option value="private" {% if request.GET.filter == 'private' %}selected{% endif %}>Приватные</option>
+                    <option value="my" {% if request.GET.filter == 'my' %}selected{% endif %}>Мои комнаты</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Найти</button>
+                    <a href="{% url 'room_list' %}" class="btn btn-secondary">Сбросить</a>
+            </form>
+        </div>
+
             <div class="create-room-section">
                 <a href="{% url 'create_room' %}" class="btn create-room-btn">
                     🚀 Создать новую комнату
                 </a>
             </div>
-        {% else %}
             <div class="guest-notice">
                 <p>🔒 Для создания комнат и отправки сообщений необходимо авторизоваться</p>
                 <div class="auth-buttons">
@@ -456,12 +661,8 @@
                     </a>
                 </div>
             </div>
-        {% endif %}
 
-        <!-- Rooms Grid -->
-        {% if rooms %}
             <div class="rooms-grid">
-                {% for room in rooms %}
                     <div class="room-card">
                         <div class="room-header">
                             <a href="{% url 'room_detail' room.id %}" class="room-title">
@@ -490,33 +691,25 @@
                                 <span>🕐</span>
                                 <span>{{ room.created_at|date:"H:i" }}</span>
                             </div>
-                            {% if room.is_private %}
                                 <div class="meta-item">
                                     <span>🔒</span>
                                     <span>Приватная</span>
-                                </div>
-                            {% endif %}
+                                </div
                         </div>
                         
                         <div class="room-actions">
                             <a href="{% url 'room_detail' room.id %}" class="btn btn-sm btn-chat">
                                 💬 Войти в чат
                             </a>
-                            {% if user.is_authenticated and user == room.created_by or user.is_superuser %}
                                 <a href="{% url 'delete_room' room.id %}" class="btn btn-sm btn-delete" 
-                                   onclick="return confirm('Вы уверены, что хотите удалить комнату \{{ room.name }}\ Это действие нельзя отменить.');">
-                                     Удалить
+                                   onclick="return confirmDelete('{{ room.name }}');">
+                                    🗑️ Удалить
                                 </a>
-                            {% endif %}
                         </div>
                     </div>
-                {% endfor %}
             </div>
-        {% else %}
             <div class="empty-state">
                 <h2>😴 Пока здесь тихо...</h2>
-                <p>{% if user.is_authenticated %}Создайте первую комнату и начните общение!{% else %}Войдите в систему, чтобы создать первую комнату{% endif %}</p>
-                {% if user.is_authenticated %}
                     <a href="{% url 'create_room' %}" class="btn create-room-btn">
                         🚀 Создать первую комнату
                     </a>
@@ -526,8 +719,13 @@
 
         <!-- Footer -->
         <div class="footer">
-        
+            <p>© 2024 Чат-комнаты. Все права защищены.</p>
         </div>
+    </div>
+
+    <!-- Scroll to top button -->
+    <div class="scroll-top" id="scrollTop">
+        ↑
     </div>
 
     <script>
@@ -560,6 +758,80 @@
                     card.style.transform = 'translateY(0)';
                 }, index * 100);
             });
+
+            // Scroll to top functionality
+            const scrollTopBtn = document.getElementById('scrollTop');
+            
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    scrollTopBtn.classList.add('visible');
+                } else {
+                    scrollTopBtn.classList.remove('visible');
+                }
+            });
+
+            scrollTopBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Добавляем ripple эффект к кнопкам
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const rect = button.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const ripple = document.createElement('span');
+                    ripple.style.cssText = `
+                        position: absolute;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.6);
+                        transform: scale(0);
+                        animation: ripple 0.6s linear;
+                        pointer-events: none;
+                    `;
+                    
+                    const size = Math.max(rect.width, rect.height);
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x - size / 2 + 'px';
+                    ripple.style.top = y - size / 2 + 'px';
+                    
+                    button.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+
+            // Добавляем стиль для ripple анимации
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    to {
+                        transform: scale(4);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+
+        // Обработка отправки формы поиска с индикатором загрузки
+        document.querySelector('.search-form')?.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<div class="loading"></div> Поиск...';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 1000);
         });
     </script>
 </body>
