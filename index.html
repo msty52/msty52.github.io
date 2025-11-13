@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Чат-комнаты | Общение в реальном времени</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <style>
         * {
             margin: 0;
@@ -17,12 +19,15 @@
             min-height: 100vh;
             color: #333;
             line-height: 1.6;
+            display: flex;
+            flex-direction: column;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            flex: 1;
         }
 
         /* Header Styles */
@@ -44,6 +49,51 @@
             font-size: 1.2rem;
             opacity: 0.9;
             font-weight: 300;
+        }
+
+        /* Navigation Header */
+        .nav-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideInUp 0.6s ease;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: #333;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
         }
 
         /* User Menu */
@@ -174,6 +224,11 @@
         .btn-outline:hover {
             background: rgba(255, 255, 255, 0.1);
             border-color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
         }
 
         /* Messages */
@@ -397,6 +452,10 @@
             opacity: 0.7;
             font-size: 0.9rem;
             animation: fadeIn 0.6s ease;
+            margin-top: auto;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            margin-top: 40px;
         }
 
         /* Loading Animation */
@@ -517,6 +576,16 @@
                 font-size: 2.2rem;
             }
 
+            .nav-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
             .user-menu-content {
                 flex-direction: column;
                 gap: 15px;
@@ -581,9 +650,37 @@
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
         }
+
+        /* Hidden utility class */
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation Header -->
+    <div class="nav-header">
+        <div class="nav-content">
+            <a href="index.html" class="logo">💬 Чат-комнаты</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="home.html" id="chat-link" class="hidden">Чат</a></li>
+                <li><a href="create_room.html" id="create-room-link" class="hidden">Создать комнату</a></li>
+                <li><a href="register.html" id="register-link">Регистрация</a></li>
+            </ul>
+            <div class="auth-buttons" id="auth-buttons">
+                <a href="auth.html" class="btn btn-primary">🔑 Войти</a>
+            </div>
+            <div class="user-info hidden" id="user-info">
+                <div class="user-avatar" id="user-avatar-nav">
+                    U
+                </div>
+                <span id="username-display">Пользователь</span>
+                <button class="btn btn-danger" id="logout-btn">🚪 Выйти</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <!-- Header -->
         <div class="header">
@@ -591,131 +688,66 @@
             <p>Общайтесь в реальном времени с друзьями и коллегами</p>
         </div>
 
+        <!-- User Menu -->
         <div class="user-menu">
-            <div class="user-menu-content">
-                    <div class="user-info">
-                        <div class="user-avatar">
-                            {{ user.username|first|upper }}
-                        </div>
-                        <div class="user-details">
-                            <h3>👋 Привет, {{ user.username }}!</h3>
-                            <p>{{ user.email|default:"Добро пожаловать в чат" }}</p>
-                        </div>
-                    </div>
-                    <div class="auth-buttons">
-                        <a href="{% url 'logout' %}" class="btn btn-secondary">
-                            🚪 Выйти
-                        </a>
-                    </div>
-                    <div class="user-info">
-                        <div class="user-details">
-                            <h3>👋 Добро пожаловать!</h3>
-                            <p>Присоединяйтесь к нашему сообществу</p>
-                        </div>
-                    </div>
-                    <div class="auth-buttons">
-                        <a href="{% url 'login' %}" class="btn btn-primary">
-                            🔑 Войти
-                        </a>
-                        <a href="{% url 'register' %}" class="btn btn-secondary">
-                            👤 Регистрация
-                        </a>
-                    </div>
+            <div class="user-menu-content" id="user-menu-content">
+                <!-- Content will be populated by JavaScript -->
             </div>
         </div>
 
-            <div class="messages">
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-            </div>
+        <!-- Messages -->
+        <div class="messages" id="messages-container">
+            <!-- Messages will be populated by JavaScript -->
+        </div>
 
         <!-- Search and Filter -->
         <div class="search-filter">
             <form class="search-form" method="GET" action="">
-                <input type="text" name="q" class="search-input" placeholder="🔍 Поиск по названию комнаты..." value="{{ request.GET.q }}">
+                <input type="text" name="q" class="search-input" placeholder="🔍 Поиск по названию комнаты..." value="">
                 <select name="filter" class="filter-select">
                     <option value="">Все комнаты</option>
-                    <option value="public" {% if request.GET.filter == 'public' %}selected{% endif %}>Публичные</option>
-                    <option value="private" {% if request.GET.filter == 'private' %}selected{% endif %}>Приватные</option>
-                    <option value="my" {% if request.GET.filter == 'my' %}selected{% endif %}>Мои комнаты</option>
+                    <option value="public">Публичные</option>
+                    <option value="private">Приватные</option>
+                    <option value="my">Мои комнаты</option>
                 </select>
                 <button type="submit" class="btn btn-primary">Найти</button>
-                    <a href="{% url 'room_list' %}" class="btn btn-secondary">Сбросить</a>
+                <a href="index.html" class="btn btn-secondary">Сбросить</a>
             </form>
         </div>
 
-            <div class="create-room-section">
-                <a href="{% url 'create_room' %}" class="btn create-room-btn">
-                    🚀 Создать новую комнату
+        <!-- Create Room Section -->
+        <div class="create-room-section hidden" id="create-room-section">
+            <a href="create_room.html" class="btn create-room-btn">
+                🚀 Создать новую комнату
+            </a>
+        </div>
+
+        <!-- Guest Notice -->
+        <div class="guest-notice hidden" id="guest-notice">
+            <p>🔒 Для создания комнат и отправки сообщений необходимо авторизоваться</p>
+            <div class="auth-buttons">
+                <a href="auth.html" class="btn btn-primary">
+                    🔑 Войти в систему
+                </a>
+                <a href="register.html" class="btn btn-outline">
+                    👤 Создать аккаунт
                 </a>
             </div>
-            <div class="guest-notice">
-                <p>🔒 Для создания комнат и отправки сообщений необходимо авторизоваться</p>
-                <div class="auth-buttons">
-                    <a href="{% url 'login' %}" class="btn btn-primary">
-                        🔑 Войти в систему
-                    </a>
-                    <a href="{% url 'register' %}" class="btn btn-outline">
-                        👤 Создать аккаунт
-                    </a>
-                </div>
-            </div>
+        </div>
 
-            <div class="rooms-grid">
-                    <div class="room-card">
-                        <div class="room-header">
-                            <a href="{% url 'room_detail' room.id %}" class="room-title">
-                                {{ room.name }}
-                            </a>
-                            <div class="room-stats">
-                                <span class="stat-badge">👥 {{ room.members.count }}</span>
-                                <span class="stat-badge">💬 {{ room.messages.count }}</span>
-                            </div>
-                        </div>
-                        
-                        <p class="room-description">
-                            {{ room.description|default:"Комната для общения и обмена мнениями" }}
-                        </p>
-                        
-                        <div class="room-meta">
-                            <div class="meta-item">
-                                <span>👤</span>
-                                <span>{{ room.created_by.username }}</span>
-                            </div>
-                            <div class="meta-item">
-                                <span>📅</span>
-                                <span>{{ room.created_at|date:"d.m.Y" }}</span>
-                            </div>
-                            <div class="meta-item">
-                                <span>🕐</span>
-                                <span>{{ room.created_at|date:"H:i" }}</span>
-                            </div>
-                                <div class="meta-item">
-                                    <span>🔒</span>
-                                    <span>Приватная</span>
-                                </div
-                        </div>
-                        
-                        <div class="room-actions">
-                            <a href="{% url 'room_detail' room.id %}" class="btn btn-sm btn-chat">
-                                💬 Войти в чат
-                            </a>
-                                <a href="{% url 'delete_room' room.id %}" class="btn btn-sm btn-delete" 
-                                   onclick="return confirmDelete('{{ room.name }}');">
-                                    🗑️ Удалить
-                                </a>
-                        </div>
-                    </div>
-            </div>
-            <div class="empty-state">
-                <h2>😴 Пока здесь тихо...</h2>
-                    <a href="{% url 'create_room' %}" class="btn create-room-btn">
-                        🚀 Создать первую комнату
-                    </a>
-                {% endif %}
-            </div>
-        {% endif %}
+        <!-- Rooms Grid -->
+        <div class="rooms-grid" id="rooms-grid">
+            <!-- Rooms will be populated by JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state hidden" id="empty-state">
+            <h2>😴 Пока здесь тихо...</h2>
+            <p id="empty-state-message">Войдите в систему, чтобы создать первую комнату</p>
+            <a href="create_room.html" class="btn create-room-btn hidden" id="empty-state-btn">
+                🚀 Создать первую комнату
+            </a>
+        </div>
 
         <!-- Footer -->
         <div class="footer">
@@ -729,21 +761,163 @@
     </div>
 
     <script>
+        // Инициализация Supabase после загрузки страницы
+        let supabaseClient;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем что конфиг загружен
+            if (typeof SUPABASE_URL === 'undefined' || typeof SUPABASE_ANON_KEY === 'undefined') {
+                console.error('Config не загружен! Проверьте config.js');
+                showMessage('Ошибка конфигурации. Проверьте config.js', 'error');
+                return;
+            }
+            
+            console.log('Инициализация Supabase...', SUPABASE_URL);
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase инициализирован');
+            
+            updateAuthUI();
+            loadRooms();
+        });
+
+        async function checkAuth() {
+            const user = localStorage.getItem('currentUser');
+            if (user) {
+                return JSON.parse(user);
+            }
+            return null;
+        }
+
+        async function updateAuthUI() {
+            const user = await checkAuth();
+            const authButtons = document.getElementById('auth-buttons');
+            const userInfo = document.getElementById('user-info');
+            const userMenuContent = document.getElementById('user-menu-content');
+            const createRoomSection = document.getElementById('create-room-section');
+            const guestNotice = document.getElementById('guest-notice');
+            const chatLink = document.getElementById('chat-link');
+            const createRoomLink = document.getElementById('create-room-link');
+            const registerLink = document.getElementById('register-link');
+            const emptyStateBtn = document.getElementById('empty-state-btn');
+            const emptyStateMessage = document.getElementById('empty-state-message');
+
+            if (user) {
+                // Пользователь авторизован
+                authButtons.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                document.getElementById('username-display').textContent = user.username;
+                document.getElementById('user-avatar-nav').textContent = user.username.charAt(0).toUpperCase();
+                
+                // Обновляем user menu
+                userMenuContent.innerHTML = `
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            ${user.username.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="user-details">
+                            <h3>👋 Привет, ${user.username}!</h3>
+                            <p>${user.email || 'Добро пожаловать в чат'}</p>
+                        </div>
+                    </div>
+                    <div class="auth-buttons">
+                        <button class="btn btn-secondary" id="nav-logout-btn">
+                            🚪 Выйти
+                        </button>
+                    </div>
+                `;
+                
+                createRoomSection.classList.remove('hidden');
+                guestNotice.classList.add('hidden');
+                
+                chatLink.classList.remove('hidden');
+                createRoomLink.classList.remove('hidden');
+                registerLink.classList.add('hidden');
+                
+                emptyStateBtn.classList.remove('hidden');
+                emptyStateMessage.textContent = 'Создайте первую комнату и начните общение!';
+                
+                // Добавляем обработчик для кнопки выхода в user menu
+                document.getElementById('nav-logout-btn').addEventListener('click', function() {
+                    localStorage.removeItem('currentUser');
+                    updateAuthUI();
+                    loadRooms();
+                    showMessage('Вы успешно вышли из системы', 'success');
+                });
+                
+            } else {
+                // Пользователь не авторизован
+                authButtons.classList.remove('hidden');
+                userInfo.classList.add('hidden');
+                
+                // Обновляем user menu
+                userMenuContent.innerHTML = `
+                    <div class="user-info">
+                        <div class="user-details">
+                            <h3>👋 Добро пожаловать!</h3>
+                            <p>Присоединяйтесь к нашему сообществу</p>
+                        </div>
+                    </div>
+                    <div class="auth-buttons">
+                        <a href="auth.html" class="btn btn-primary">
+                            🔑 Войти
+                        </a>
+                        <a href="register.html" class="btn btn-secondary">
+                            👤 Регистрация
+                        </a>
+                    </div>
+                `;
+                
+                createRoomSection.classList.add('hidden');
+                guestNotice.classList.remove('hidden');
+                
+                chatLink.classList.add('hidden');
+                createRoomLink.classList.add('hidden');
+                registerLink.classList.remove('hidden');
+                
+                emptyStateBtn.classList.add('hidden');
+                emptyStateMessage.textContent = 'Войдите в систему, чтобы создать первую комнату';
+            }
+        }
+
+        async function loadRooms() {
+            const user = await checkAuth();
+            const roomsGrid = document.getElementById('rooms-grid');
+            const emptyState = document.getElementById('empty-state');
+            
+            // Здесь будет загрузка комнат из Supabase
+            // Показываем заглушки
+            roomsGrid.innerHTML = '';
+            emptyState.classList.remove('hidden');
+            
+            // В реальном приложении здесь будет запрос к Supabase
+            console.log('Загрузка комнат...');
+        }
+
+        function showMessage(message, type = 'info') {
+            const messagesContainer = document.getElementById('messages-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            messagesContainer.appendChild(alert);
+            
+            // Автоматически удаляем сообщение через 5 секунд
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Обработчик для кнопки выхода в навигации
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('currentUser');
+            updateAuthUI();
+            loadRooms();
+            showMessage('Вы успешно вышли из системы', 'success');
+        });
+
         // Подтверждение удаления комнаты
         function confirmDelete(roomName) {
             return confirm('Вы уверены, что хотите удалить комнату "' + roomName + '"?\n\nВсе сообщения и данные этой комнаты будут безвозвратно удалены.');
         }
-
-        // Добавляем обработчики для всех кнопок удаления
-        document.querySelectorAll('.btn-delete').forEach(function(button) {
-            button.addEventListener('click', function(e) {
-                const roomCard = this.closest('.room-card');
-                const roomName = roomCard.querySelector('.room-title').textContent;
-                if (!confirmDelete(roomName)) {
-                    e.preventDefault();
-                }
-            });
-        });
 
         // Анимация появления карточек
         document.addEventListener('DOMContentLoaded', function() {
