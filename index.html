@@ -30,7 +30,6 @@
             flex: 1;
         }
 
-        /* Header Styles */
         .header {
             text-align: center;
             margin-bottom: 40px;
@@ -51,7 +50,6 @@
             font-weight: 300;
         }
 
-        /* Navigation Header */
         .nav-header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -96,7 +94,6 @@
             color: #667eea;
         }
 
-        /* User Menu */
         .user-menu {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -231,7 +228,6 @@
             color: white;
         }
 
-        /* Messages */
         .messages {
             margin-bottom: 20px;
             animation: fadeIn 0.5s ease;
@@ -263,7 +259,6 @@
             box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
         }
 
-        /* Create Room Section */
         .create-room-section {
             text-align: center;
             margin-bottom: 40px;
@@ -300,7 +295,6 @@
             margin-bottom: 15px;
         }
 
-        /* Rooms Grid */
         .rooms-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -424,7 +418,6 @@
             color: white;
         }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -444,7 +437,6 @@
             margin-bottom: 25px;
         }
 
-        /* Footer */
         .footer {
             text-align: center;
             padding: 30px 0;
@@ -458,7 +450,6 @@
             margin-top: 40px;
         }
 
-        /* Loading Animation */
         .loading {
             display: inline-block;
             width: 20px;
@@ -469,7 +460,6 @@
             animation: spin 1s ease-in-out infinite;
         }
 
-        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -523,7 +513,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Search and Filter */
         .search-filter {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
@@ -570,7 +559,6 @@
             border-color: #667eea;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2.2rem;
@@ -620,7 +608,6 @@
             }
         }
 
-        /* Scroll to top button */
         .scroll-top {
             position: fixed;
             bottom: 30px;
@@ -651,14 +638,13 @@
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
         }
 
-        /* Hidden utility class */
         .hidden {
             display: none !important;
         }
     </style>
 </head>
 <body>
-    <!-- Navigation Header -->
+
     <div class="nav-header">
         <div class="nav-content">
             <a href="index.html" class="logo">💬 Чат-комнаты</a>
@@ -673,7 +659,7 @@
             </div>
             <div class="user-info hidden" id="user-info">
                 <div class="user-avatar" id="user-avatar-nav">
-                    U
+
                 </div>
                 <span id="username-display">Пользователь</span>
                 <button class="btn btn-danger" id="logout-btn">🚪 Выйти</button>
@@ -682,47 +668,22 @@
     </div>
 
     <div class="container">
-        <!-- Header -->
+
         <div class="header">
             <h1>💬 Чат-комнаты</h1>
             <p>Общайтесь в реальном времени с друзьями и коллегами</p>
         </div>
 
-        <!-- User Menu -->
         <div class="user-menu">
             <div class="user-menu-content" id="user-menu-content">
-                <!-- Content will be populated by JavaScript -->
+
             </div>
         </div>
 
-        <!-- Messages -->
         <div class="messages" id="messages-container">
-            <!-- Messages will be populated by JavaScript -->
+
         </div>
 
-        <!-- Search and Filter -->
-        <div class="search-filter">
-            <form class="search-form" method="GET" action="">
-                <input type="text" name="q" class="search-input" placeholder="🔍 Поиск по названию комнаты..." value="">
-                <select name="filter" class="filter-select">
-                    <option value="">Все комнаты</option>
-                    <option value="public">Публичные</option>
-                    <option value="private">Приватные</option>
-                    <option value="my">Мои комнаты</option>
-                </select>
-                <button type="submit" class="btn btn-primary">Найти</button>
-                <a href="index.html" class="btn btn-secondary">Сбросить</a>
-            </form>
-        </div>
-
-        <!-- Create Room Section -->
-        <div class="create-room-section hidden" id="create-room-section">
-            <a href="create_room.html" class="btn create-room-btn">
-                🚀 Создать новую комнату
-            </a>
-        </div>
-
-        <!-- Guest Notice -->
         <div class="guest-notice hidden" id="guest-notice">
             <p>🔒 Для создания комнат и отправки сообщений необходимо авторизоваться</p>
             <div class="auth-buttons">
@@ -735,28 +696,24 @@
             </div>
         </div>
 
-        <!-- Rooms Grid -->
         <div class="rooms-grid" id="rooms-grid">
-            <!-- Rooms will be populated by JavaScript -->
+
         </div>
 
-        <!-- Empty State -->
         <div class="empty-state hidden" id="empty-state">
         </div>
 
-        <!-- Footer -->
         <div class="footer">
             <p>© 2025 Чат-комнаты. Все права защищены.</p>
         </div>
     </div>
 
-    <!-- Scroll to top button -->
     <div class="scroll-top" id="scrollTop">
         ↑
     </div>
 
     <script>
-        // Инициализация Supabase после загрузки страницы
+        
         let supabaseClient;
         
         document.addEventListener('DOMContentLoaded', function() {
@@ -797,13 +754,12 @@
             const emptyStateMessage = document.getElementById('empty-state-message');
 
             if (user) {
-                // Пользователь авторизован
+
                 authButtons.classList.add('hidden');
                 userInfo.classList.remove('hidden');
                 document.getElementById('username-display').textContent = user.username;
                 document.getElementById('user-avatar-nav').textContent = user.username.charAt(0).toUpperCase();
                 
-                // Обновляем user menu
                 userMenuContent.innerHTML = `
                     <div class="user-info">
                         <div class="user-avatar">
@@ -830,8 +786,7 @@
                 
                 emptyStateBtn.classList.remove('hidden');
                 emptyStateMessage.textContent = 'Создайте первую комнату и начните общение!';
-                
-                // Добавляем обработчик для кнопки выхода в user menu
+
                 document.getElementById('nav-logout-btn').addEventListener('click', function() {
                     localStorage.removeItem('currentUser');
                     updateAuthUI();
@@ -840,11 +795,10 @@
                 });
                 
             } else {
-                // Пользователь не авторизован
+
                 authButtons.classList.remove('hidden');
                 userInfo.classList.add('hidden');
-                
-                // Обновляем user menu
+ 
                 userMenuContent.innerHTML = `
                     <div class="user-info">
                         <div class="user-details">
@@ -878,13 +832,10 @@
             const user = await checkAuth();
             const roomsGrid = document.getElementById('rooms-grid');
             const emptyState = document.getElementById('empty-state');
-            
-            // Здесь будет загрузка комнат из Supabase
-            // Показываем заглушки
+   
             roomsGrid.innerHTML = '';
             emptyState.classList.remove('hidden');
-            
-            // В реальном приложении здесь будет запрос к Supabase
+         
             console.log('Загрузка комнат...');
         }
 
@@ -894,14 +845,12 @@
             alert.className = `alert alert-${type}`;
             alert.textContent = message;
             messagesContainer.appendChild(alert);
-            
-            // Автоматически удаляем сообщение через 5 секунд
+
             setTimeout(() => {
                 alert.remove();
             }, 5000);
         }
 
-        // Обработчик для кнопки выхода в навигации
         document.getElementById('logout-btn').addEventListener('click', function() {
             localStorage.removeItem('currentUser');
             updateAuthUI();
@@ -909,12 +858,10 @@
             showMessage('Вы успешно вышли из системы', 'success');
         });
 
-        // Подтверждение удаления комнаты
         function confirmDelete(roomName) {
             return confirm('Вы уверены, что хотите удалить комнату "' + roomName + '"?\n\nВсе сообщения и данные этой комнаты будут безвозвратно удалены.');
         }
 
-        // Анимация появления карточек
         document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.room-card');
             cards.forEach((card, index) => {
@@ -928,7 +875,6 @@
                 }, index * 100);
             });
 
-            // Scroll to top functionality
             const scrollTopBtn = document.getElementById('scrollTop');
             
             window.addEventListener('scroll', function() {
@@ -946,7 +892,6 @@
                 });
             });
 
-            // Добавляем ripple эффект к кнопкам
             const buttons = document.querySelectorAll('.btn');
             buttons.forEach(button => {
                 button.addEventListener('click', function(e) {
@@ -977,7 +922,6 @@
                 });
             });
 
-            // Добавляем стиль для ripple анимации
             const style = document.createElement('style');
             style.textContent = `
                 @keyframes ripple {
@@ -990,7 +934,6 @@
             document.head.appendChild(style);
         });
 
-        // Обработка отправки формы поиска с индикатором загрузки
         document.querySelector('.search-form')?.addEventListener('submit', function(e) {
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
